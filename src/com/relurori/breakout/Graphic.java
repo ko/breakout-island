@@ -3,14 +3,20 @@ package com.relurori.breakout;
 import android.graphics.Bitmap;
 
 public class Graphic {
-	private Bitmap _bitmap;
-    private Coordinates coordinates;
-    private Speed speed;
+	protected Bitmap bitmap;
+    protected Coordinates coordinates;
+    protected Speed speed;
     
     public Graphic(Bitmap bitmap) {
-        _bitmap = bitmap;
-        coordinates = new Coordinates();
-        speed = new Speed();
+        this.bitmap = bitmap;
+        this.coordinates = new Coordinates();
+        this.speed = new Speed();
+    }
+    
+    public Graphic(Bitmap bitmap, int startX, int startY) {
+    	this.bitmap = bitmap;
+    	this.coordinates = new Coordinates(startX, startY);
+    	this.speed = new Speed();
     }
      
     public Speed getSpeed() {
@@ -18,7 +24,7 @@ public class Graphic {
     }
  
     public Bitmap getGraphic() {
-        return _bitmap;
+        return bitmap;
     }
  
     public Coordinates getCoordinates() {
@@ -124,27 +130,37 @@ public class Graphic {
     
     /** Contains the coordinates of the graphic. */
     public class Coordinates {
-        private int _x = 100;
-        private int _y = 0;
+        private int x;
+        private int y;
  
+        public Coordinates() {
+        	this.x = 0;
+        	this.y = 0;
+        }
+        
+        public Coordinates(int x, int y) {
+        	this.x = x;
+        	this.y = y;
+        }
+        
         public int getX() {
-            return _x + _bitmap.getWidth() / 2;
+            return x + bitmap.getWidth() / 2;
         }
  
         public void setX(int value) {
-            _x = value - _bitmap.getWidth() / 2;
+            x = value - bitmap.getWidth() / 2;
         }
  
         public int getY() {
-            return _y + _bitmap.getHeight() / 2;
+            return y + bitmap.getHeight() / 2;
         }
  
         public void setY(int value) {
-            _y = value - _bitmap.getHeight() / 2;
+            y = value - bitmap.getHeight() / 2;
         }
  
         public String toString() {
-            return "Coordinates: (" + _x + "/" + _y + ")";
+            return "Coordinates: (" + x + "/" + y + ")";
         }
     }
 }

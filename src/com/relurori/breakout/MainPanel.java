@@ -21,6 +21,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private ArrayList<Graphic> graphics = new ArrayList<Graphic>();
 	private Graphic currentGraphic = null;
+	private Paddle paddle = null;
 
 	public MainPanel(Context context) {
 		super(context);
@@ -62,8 +63,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		synchronized (thread.getSurfaceHolder()) {
 			Graphic graphic = null;
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				graphic = new Graphic(BitmapFactory.decodeResource(
-						getResources(), R.drawable.ic_launcher));
+				Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+						R.drawable.ic_launcher);
+				graphic = new Graphic(launcher);
 				graphic.getCoordinates().setX(
 						(int) event.getX() - graphic.getGraphic().getWidth()
 								/ 2);
@@ -89,6 +91,35 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void draw(Canvas canvas) {
 		canvas.drawColor(Color.BLACK);
+		
+		drawBall(canvas);
+		drawPaddle(canvas);
+	}
+
+	private void drawPaddle(Canvas canvas) {
+		Bitmap bitmap;
+		Graphic.Coordinates coords;
+		int xRight;
+		int xLeft;
+		
+		/* getHeight() returns 0 in onCreate() */
+		if (paddle == null) {
+			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+					R.drawable.ic_launcher);
+			paddle = new Paddle(launcher);
+			paddle.coordinates.setY(getHeight() - launcher.getHeight());
+			Log.d(TAG, "height=" + getHeight());
+		}
+		
+		bitmap = paddle.getGraphic();
+		coords = paddle.getCoordinates();
+		xLeft = coords.getX();
+		xRight = coords.getX() + paddle.getWidth();
+		canvas.drawBitmap(bitmap, xLeft, coords.getY(), null);
+		canvas.drawBitmap(bitmap, xRight, coords.getY(), null);
+	}
+
+	private void drawBall(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
 		for (Graphic graphic : graphics) {
@@ -102,45 +133,62 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			coords = currentGraphic.getCoordinates();
 			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
 		}
+		
 	}
 
 	public void updatePhysics() {
-		Graphic.Coordinates coord;
-		Graphic.Speed speed;
+
 		for (Graphic graphic : graphics) {
-			coord = graphic.getCoordinates();
-			speed = graphic.getSpeed();
+			updateGraphicPhysics(graphic);
+		}
+	}
 
-			// Direction
-			if (speed.getXDirection() == Graphic.Speed.X_DIRECTION_RIGHT) {
-				coord.setX(coord.getX() + speed.getX());
-			} else {
-				coord.setX(coord.getX() - speed.getX());
-			}
-			if (speed.getYDirection() == Graphic.Speed.Y_DIRECTION_DOWN) {
-				coord.setY(coord.getY() + speed.getY());
-			} else {
-				coord.setY(coord.getY() - speed.getY());
-			}
+	private void updateGraphicPhysics(Graphic graphic) {
+		Graphic.Coordinates coord = graphic.getCoordinates();
+		Graphic.Speed speed = graphic.getSpeed();
+		boolean paddleHit = false;
 
-			// borders for x...
-			if (coord.getX() < 0) {
-				speed.toggleXDirection();
-				coord.setX(-coord.getX());
-			} else if (coord.getX() + graphic.getGraphic().getWidth() > getWidth()) {
-				speed.toggleXDirection();
-				coord.setX(coord.getX() + getWidth()
-						- (coord.getX() + graphic.getGraphic().getWidth()));
-			}
+		// Direction
+		if (speed.getXDirection() == Graphic.Speed.X_DIRECTION_RIGHT) {
+			coord.setX(coord.getX() + speed.getX());
+		} else {
+			coord.setX(coord.getX() - speed.getX());
+		}
+		if (speed.getYDirection() == Graphic.Speed.Y_DIRECTION_DOWN) {
+			coord.setY(coord.getY() + speed.getY());
+		} else {
+			coord.setY(coord.getY() - speed.getY());
+		}
 
-			// borders for y...
-			if (coord.getY() < 0) {
-				speed.toggleYDirection();
-				coord.setY(-coord.getY());
-			} else if (coord.getY() + graphic.getGraphic().getHeight() > getHeight()) {
+		// borders for x...
+		if (coord.getX() < 0) {
+			speed.toggleXDirection();
+			coord.setX(-coord.getX());
+		} else if (coord.getX() + graphic.getGraphic().getWidth() > getWidth()) {
+			speed.toggleXDirection();
+			coord.setX(coord.getX() + getWidth()
+					- (coord.getX() + graphic.getGraphic().getWidth()));
+		}
+
+		// borders for paddle...
+		if ((coord.getX() < (paddle.getCoordinates().getX() + paddle.getWidth()))
+				&& (coord.getX() > (paddle.getCoordinates().getX()))) {
+			paddleHit = true;
+		} else {
+			paddleHit = false;
+		}
+
+		// borders for y...
+		if (coord.getY() < 0) {
+			speed.toggleYDirection();
+			coord.setY(-coord.getY());
+		} else if (coord.getY() + graphic.getGraphic().getHeight() > getHeight()) {
+			if (paddleHit) {
 				speed.toggleYDirection();
 				coord.setY(coord.getY() + getHeight()
 						- (coord.getY() + graphic.getGraphic().getHeight()));
+			} else {
+				graphics.remove(graphic);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package com.relurori.breakout;
 
+import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -27,16 +28,29 @@ public class MainThread extends Thread {
 		this.running = running;
 	}
 	
+	public SurfaceHolder getSurfaceHolder() {
+		return surfaceHolder;
+	}
+	
 	/** game loop */
 	@Override
 	public void run() {
+		Canvas c = null;
 		long ticks = 0L;
 		Log.d(TAG, "Starting game loop");
 		while (running) {
+			try {
+				c = surfaceHolder.lockCanvas();
+				synchronized(surfaceHolder) {
+					panel.updatePhysics();
+					panel.draw(c);
+				}
+			} finally {
+				if (c != null) {
+					surfaceHolder.unlockCanvasAndPost(c);
+				}
+			}
 			ticks++;
-			
-			//updateGameState();
-			//renderGameState();
 		}
 		Log.d(TAG, "Game loop ran " + ticks + "times");
 	}

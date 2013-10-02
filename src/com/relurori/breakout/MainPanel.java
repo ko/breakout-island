@@ -19,9 +19,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private MainThread thread;
 
-	private ArrayList<Graphic> graphics = new ArrayList<Graphic>();
+	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private Graphic currentGraphic = null;
 	private Paddle paddle = null;
+
+	private static float eventDownX = 0;
+	private static float eventDownY = 0;
+	private static float paddleDownX = 0;
 
 	public MainPanel(Context context) {
 		super(context);
@@ -61,29 +65,24 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		synchronized (thread.getSurfaceHolder()) {
+
 			Graphic graphic = null;
+
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-						R.drawable.ic_launcher);
-				graphic = new Graphic(launcher);
-				graphic.getCoordinates().setX(
-						(int) event.getX() - graphic.getGraphic().getWidth()
-								/ 2);
-				graphic.getCoordinates().setY(
-						(int) event.getY() - graphic.getGraphic().getHeight()
-								* 2);
-				currentGraphic = graphic;
+				eventDownX = event.getX();
+				eventDownY = event.getY();
+				paddleDownX = paddle.getCoordinates().getX();
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				currentGraphic.getCoordinates().setX(
-						(int) event.getX()
-								- currentGraphic.getGraphic().getWidth() / 2);
-				currentGraphic.getCoordinates().setY(
-						(int) event.getY()
-								- currentGraphic.getGraphic().getHeight() * 2);
-			} else if (event.getAction() == MotionEvent.ACTION_UP) {
-				graphics.add(currentGraphic);
-				currentGraphic = null;
+				float deltaX = event.getX() - eventDownX;
+				float deltaY = event.getY() - eventDownY;
+				
+				paddle.getCoordinates().setX(
+						(int) deltaX + (int)paddleDownX
+								+ paddle.getGraphic().getWidth() / 2);
+				paddle.getCoordinates().setY(
+						getHeight() - paddle.getGraphic().getHeight());
 			}
+
 			return true;
 		}
 	}
@@ -91,7 +90,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void draw(Canvas canvas) {
 		canvas.drawColor(Color.BLACK);
-		
+
 		drawBall(canvas);
 		drawPaddle(canvas);
 	}
@@ -101,16 +100,15 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Graphic.Coordinates coords;
 		int xRight;
 		int xLeft;
-		
+
 		/* getHeight() returns 0 in onCreate() */
 		if (paddle == null) {
 			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 					R.drawable.ic_launcher);
 			paddle = new Paddle(launcher);
 			paddle.coordinates.setY(getHeight() - launcher.getHeight());
-			Log.d(TAG, "height=" + getHeight());
 		}
-		
+
 		bitmap = paddle.getGraphic();
 		coords = paddle.getCoordinates();
 		xLeft = coords.getX();
@@ -122,30 +120,44 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void drawBall(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
-		for (Graphic graphic : graphics) {
-			bitmap = graphic.getGraphic();
-			coords = graphic.getCoordinates();
+
+		if (balls.isEmpty()) {
+			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+					R.drawable.ic_launcher);
+			Ball ball = new Ball(launcher);
+			ball.coordinates.setX(500);
+			ball.coordinates.setY(500);
+			balls.add(ball);
+		}
+		for (Ball ball : balls) {
+			bitmap = ball.getGraphic();
+			coords = ball.getCoordinates();
 			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
 		}
-		// draw current graphic at last...
-		if (currentGraphic != null) {
-			bitmap = currentGraphic.getGraphic();
-			coords = currentGraphic.getCoordinates();
-			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
-		}
-		
+
 	}
 
 	public void updatePhysics() {
 
-		for (Graphic graphic : graphics) {
-			updateGraphicPhysics(graphic);
+		for (Ball ball : balls) {
+			updateBallPhysics(ball);
 		}
+		if (paddle != null)
+			updatePaddlePhysics();
 	}
 
-	private void updateGraphicPhysics(Graphic graphic) {
-		Graphic.Coordinates coord = graphic.getCoordinates();
-		Graphic.Speed speed = graphic.getSpeed();
+	private void updatePaddlePhysics() {
+		Graphic.Coordinates coord = paddle.getCoordinates();
+
+		if (coord.getX() < 0)
+			paddle.getCoordinates().setX(0);
+		else if ((coord.getX() + paddle.getWidth()) > getWidth())
+			paddle.getCoordinates().setX(getWidth() - paddle.getWidth());
+	}
+
+	private void updateBallPhysics(Ball ball) {
+		Graphic.Coordinates coord = ball.getCoordinates();
+		Graphic.Speed speed = ball.getSpeed();
 		boolean paddleHit = false;
 
 		// Direction
@@ -164,10 +176,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (coord.getX() < 0) {
 			speed.toggleXDirection();
 			coord.setX(-coord.getX());
-		} else if (coord.getX() + graphic.getGraphic().getWidth() > getWidth()) {
+		} else if (coord.getX() + ball.getGraphic().getWidth() > getWidth()) {
 			speed.toggleXDirection();
 			coord.setX(coord.getX() + getWidth()
-					- (coord.getX() + graphic.getGraphic().getWidth()));
+					- (coord.getX() + ball.getGraphic().getWidth()));
 		}
 
 		// borders for paddle...
@@ -182,13 +194,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (coord.getY() < 0) {
 			speed.toggleYDirection();
 			coord.setY(-coord.getY());
-		} else if (coord.getY() + graphic.getGraphic().getHeight() > getHeight()) {
+		} else if (coord.getY() + ball.getGraphic().getHeight() > getHeight()) {
 			if (paddleHit) {
 				speed.toggleYDirection();
 				coord.setY(coord.getY() + getHeight()
-						- (coord.getY() + graphic.getGraphic().getHeight()));
+						- (coord.getY() + ball.getGraphic().getHeight()));
 			} else {
-				graphics.remove(graphic);
+				balls.remove(ball);
 			}
 		}
 	}

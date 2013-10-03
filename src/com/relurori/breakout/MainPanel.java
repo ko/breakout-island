@@ -28,6 +28,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private Paddle paddle = null;
 
 	private boolean win = false;
+	private boolean DEBUG = true;	/** affects the victory condition */
 	
 	private static float eventDownX = 0;
 	private static float eventDownY = 0;
@@ -252,7 +253,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				s.toggleXDirection();
 				s.toggleYDirection();
 				if (bricks.isEmpty() == true) {
-					win = true;;
+					win = !DEBUG;
 				}
 			}
 		}

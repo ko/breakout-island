@@ -44,6 +44,10 @@ public class MainThread extends Thread {
 				synchronized(surfaceHolder) {
 					panel.updatePhysics();
 					panel.draw(c);
+					
+					if (panel.getWinStatus() == true) {
+						break;
+					}
 				}
 			} finally {
 				if (c != null) {

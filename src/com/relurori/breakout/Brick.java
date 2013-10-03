@@ -12,50 +12,34 @@ public class Brick extends Graphic {
 
 	}
 	
-	public float[] getCornerLL() {
-		float llx = coordinates.getX() - (width/2);
-		float lly = coordinates.getY() - (height/2);
-		float[] xy = new float[2];
-		
-		xy[0] = llx;
-		xy[1] = lly;
-	
-		return xy;
-	}
-
-	public float[] getCornerLR() {
-		float llx = coordinates.getX() + (width/2);
-		float lly = coordinates.getY() - (height/2);
-		float[] xy = new float[2];
-		
-		xy[0] = llx;
-		xy[1] = lly;
-	
-		return xy;
-	}
-	
-	public float[] getCornerUL() {
-		float llx = coordinates.getX() - (width/2);
-		float lly = coordinates.getY() + (height/2);
-		float[] xy = new float[2];
-		
-		xy[0] = llx;
-		xy[1] = lly;
-	
-		return xy;
-	}
-	
-	public float[] getCornerUR() {
-		float llx = coordinates.getX() + (width/2);
-		float lly = coordinates.getY() + (height/2);
-		float[] xy = new float[2];
-		
-		xy[0] = llx;
-		xy[1] = lly;
-	
-		return xy;
-	}
-	
+	/**
+	 * ballHit - returns whether the ball has "hit" this brick.
+	 * 
+	 * Brick is as follows:
+	 * 
+	 * 			UL		UR
+	 * 			+-------+
+	 * 			|		|
+	 * 			+-------+
+	 * 			LL		LR
+	 * 
+	 * Look for whether ball has fallen between:
+	 * 
+	 * 	1.	UL		UL
+	 * 		+-------+
+	 * 
+	 * 	2.	UL
+	 * 		+
+	 * 		|
+	 * 		+
+	 * 		UR
+	 * 
+	 * If both conditions are met, then the ball has effectively 
+	 * "hit" the brick.
+	 * 
+	 * @param ball
+	 * @return
+	 */
 	public boolean ballHit(Ball ball) {
 		boolean hit = false;
 		boolean hitx = false;
@@ -74,6 +58,50 @@ public class Brick extends Graphic {
 			hit = true;
 		
 		return hit;
+	}
+	
+	private float[] getCornerLL() {
+		float llx = coordinates.getX() - (width/2);
+		float lly = coordinates.getY() - (height/2);
+		float[] xy = new float[2];
+		
+		xy[0] = llx;
+		xy[1] = lly;
+	
+		return xy;
+	}
+
+	private float[] getCornerLR() {
+		float llx = coordinates.getX() + (width/2);
+		float lly = coordinates.getY() - (height/2);
+		float[] xy = new float[2];
+		
+		xy[0] = llx;
+		xy[1] = lly;
+	
+		return xy;
+	}
+	
+	private float[] getCornerUL() {
+		float llx = coordinates.getX() - (width/2);
+		float lly = coordinates.getY() + (height/2);
+		float[] xy = new float[2];
+		
+		xy[0] = llx;
+		xy[1] = lly;
+	
+		return xy;
+	}
+	
+	private float[] getCornerUR() {
+		float llx = coordinates.getX() + (width/2);
+		float lly = coordinates.getY() + (height/2);
+		float[] xy = new float[2];
+		
+		xy[0] = llx;
+		xy[1] = lly;
+	
+		return xy;
 	}
 
 	private boolean ballHitY(int bally) {

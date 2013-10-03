@@ -114,6 +114,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		brick.getCoordinates().setX(150);
 		brick.getCoordinates().setY(100);
 		bricks.add(brick);
+		
+		launcher = BitmapFactory.decodeResource(getResources(), 
+				R.drawable.ic_launcher);
+		brick = new Brick(launcher);
+		brick.getCoordinates().setX(300);
+		brick.getCoordinates().setY(600);
+		bricks.add(brick);
 	}
 	
 	private void drawBricks(Canvas canvas) {
@@ -201,7 +208,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		coord = updateBallPhysicsDirections(coord, speed);
 
 		// Brick hit
-		ballHitBricks(ball);
+		speed = ballHitBricks(ball, speed);
 		
 		// borders for x...
 		if (coord.getX() < 0) {
@@ -228,15 +235,29 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	private void ballHitBricks(Ball ball) {
+	/**
+	 * ballHitBricks
+	 * 
+	 * @param ball
+	 * @param coord
+	 * @return Graphic.Speed, in the event that a brick is hit. We must
+	 * have the ball bounce away.
+	 */
+	private Graphic.Speed ballHitBricks(Ball ball, Graphic.Speed speed) {
+		Graphic.Speed s = speed;
+		
 		for (Brick brick : bricks) {
 			if (ballHitBrick(ball, brick)) {
 				bricks.remove(brick);
+				s.toggleXDirection();
+				s.toggleYDirection();
 				if (bricks.isEmpty() == true) {
-					win = true;
+					win = true;;
 				}
 			}
 		}
+		
+		return s;
 	}
 
 	private boolean ballHitBrick(Ball ball, Brick brick) {

@@ -1,5 +1,6 @@
 package com.relurori.breakout;
 
+import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -45,8 +46,21 @@ public class MainThread extends Thread {
 					panel.updatePhysics();
 					panel.draw(c);
 					
-					if (panel.getWinStatus() == true) {
-						break;
+					final int STATE_INPROGRESS = 0;
+					final int STATE_EXIT = 1;
+					final int STATE_RETRY = 2;
+					
+					if (panel.getPauseStatus() == true) {
+						while (panel.getRunState() == STATE_INPROGRESS) {}
+						switch(panel.getRunState()) {
+						case STATE_EXIT:
+							running = false;
+							break;
+						case STATE_RETRY:
+							running = true;
+							panel.setRunState(STATE_INPROGRESS);
+							break;
+						}
 					}
 				}
 			} finally {
@@ -56,6 +70,8 @@ public class MainThread extends Thread {
 			}
 			ticks++;
 		}
+		
 		Log.d(TAG, "Game loop ran " + ticks + "times");
 	}
+
 }

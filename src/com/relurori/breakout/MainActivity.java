@@ -2,6 +2,8 @@ package com.relurori.breakout;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.Menu;
 import android.view.Window;
@@ -23,10 +25,12 @@ public class MainActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		Log.d(TAG, "Setting content view");
-		setContentView(new MainPanel(this));
+		setContentView(new MainPanel(this, MainActivity.this));
 
 		Log.d(TAG, "Main game panel view added");
 	}
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

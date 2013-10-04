@@ -6,15 +6,19 @@ import com.relurori.breakout.Graphic.Coordinates;
 import com.relurori.breakout.Graphic.Speed;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -22,19 +26,31 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private MainThread thread;
 
+	/*
+	 * TODO does it make sense to hold a reference to the calling Context and
+	 * Activity? Seems kinda sketch.
+	 */
+	private Context context;
+	private Activity activity;
+
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private ArrayList<Brick> bricks = new ArrayList<Brick>();
 	private Graphic currentGraphic = null;
 	private Paddle paddle = null;
 
-	private boolean win = false;
-	private boolean DEBUG = true;	/** affects the victory condition */
-	
+	private int STATE_INPROGRESS = 0;
+	private int STATE_EXIT = 1;
+	private int STATE_RETRY = 2;
+	private int STATE_RUN = STATE_INPROGRESS;
+	private boolean STATE_PAUSE = false;
+	private boolean DEBUG = false;
+	/** affects the victory condition */
+
 	private static float eventDownX = 0;
 	private static float eventDownY = 0;
 	private static float paddleDownX = 0;
 
-	public MainPanel(Context context) {
+	public MainPanel(Context context, Activity activity) {
 		super(context);
 		getHolder().addCallback(this);
 
@@ -42,6 +58,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		thread = new MainThread(getHolder(), this);
 
 		setFocusable(true);
+
+		this.context = context;
+		this.activity = activity;
 	}
 
 	@Override
@@ -82,9 +101,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				float deltaX = event.getX() - eventDownX;
 				float deltaY = event.getY() - eventDownY;
-				
+
 				paddle.getCoordinates().setX(
-						(int) deltaX + (int)paddleDownX
+						(int) deltaX + (int) paddleDownX
 								+ paddle.getGraphic().getWidth() / 2);
 				paddle.getCoordinates().setY(
 						getHeight() - paddle.getGraphic().getHeight());
@@ -103,37 +122,69 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		drawBricks(canvas);
 	}
 
-	public boolean getWinStatus() {
-		return win;
+	public int getRunState() {
+		return STATE_RUN;
 	}
 	
+	public void setRunState(int state) {
+		STATE_RUN = state;
+	}
+	
+	public boolean getPauseStatus() {
+		return STATE_PAUSE;
+	}
+
+	private void resetLevel() {
+		bricks.clear();
+		addFirstBricks();
+		addFirstPaddle();
+		balls.clear();
+		addFirstBalls();
+	}
+	
+	private void addFirstBalls() {
+		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+				R.drawable.ball);
+		Ball ball = new Ball(launcher);
+		ball.coordinates.setX(500);
+		ball.coordinates.setY(500);
+		balls.add(ball);
+	}
+
+	private void addFirstPaddle() {
+		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+				R.drawable.paddle);
+		paddle = new Paddle(launcher);
+		paddle.coordinates.setY(getHeight() - launcher.getHeight());
+	}
+
 	private void addFirstBricks() {
 		// draw initial blocks
-		Bitmap launcher = BitmapFactory.decodeResource(getResources(), 
+		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		Brick brick = new Brick(launcher);
 		brick.getCoordinates().setX(150);
 		brick.getCoordinates().setY(100);
 		bricks.add(brick);
-		
-		launcher = BitmapFactory.decodeResource(getResources(), 
+
+		launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		brick = new Brick(launcher);
 		brick.getCoordinates().setX(300);
 		brick.getCoordinates().setY(600);
 		bricks.add(brick);
 	}
-	
+
 	private void drawBricks(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
-		
+
 		if (bricks.isEmpty()) {
-			if (win == false) {
+			if (STATE_RUN == STATE_INPROGRESS) {
 				addFirstBricks();
 			}
 		}
-		
+
 		for (Brick brick : bricks) {
 			bitmap = brick.getGraphic();
 			coords = brick.getCoordinates();
@@ -148,10 +199,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 		/* getHeight() returns 0 in onCreate() */
 		if (paddle == null) {
-			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-					R.drawable.paddle);
-			paddle = new Paddle(launcher);
-			paddle.coordinates.setY(getHeight() - launcher.getHeight());
+			addFirstPaddle();
 		}
 
 		bitmap = paddle.getGraphic();
@@ -165,12 +213,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Graphic.Coordinates coords;
 
 		if (balls.isEmpty()) {
-			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-					R.drawable.ball);
-			Ball ball = new Ball(launcher);
-			ball.coordinates.setX(500);
-			ball.coordinates.setY(500);
-			balls.add(ball);
+			addFirstBalls();
 		}
 		for (Ball ball : balls) {
 			bitmap = ball.getGraphic();
@@ -203,13 +246,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Graphic.Speed speed = ball.getSpeed();
 
 		int paddleLevel = getHeight() - paddle.getGraphic().getHeight();
-		
+
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
 
 		// Brick hit
 		speed = ballHitBricks(ball, speed);
-		
+
 		// borders for x...
 		if (coord.getX() < 0) {
 			speed.toggleXDirection();
@@ -241,34 +284,34 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	 * 
 	 * @param ball
 	 * @param coord
-	 * @return Graphic.Speed, in the event that a brick is hit. We must
-	 * have the ball bounce away.
+	 * @return Graphic.Speed, in the event that a brick is hit. We must have the
+	 *         ball bounce away.
 	 */
 	private Graphic.Speed ballHitBricks(Ball ball, Graphic.Speed speed) {
 		Graphic.Speed s = speed;
-		
+
 		for (Brick brick : bricks) {
 			if (ballHitBrick(ball, brick)) {
 				bricks.remove(brick);
 				s.toggleXDirection();
 				s.toggleYDirection();
 				if (bricks.isEmpty() == true) {
-					win = !DEBUG;
+					victory();
 				}
 			}
 		}
-		
+
 		return s;
 	}
 
 	private boolean ballHitBrick(Ball ball, Brick brick) {
-		
+
 		return brick.ballHit(ball);
 	}
 
 	private Coordinates updateBallPhysicsDirections(Coordinates coord,
 			Speed speed) {
-		
+
 		if (speed.getXDirection() == Graphic.Speed.X_DIRECTION_RIGHT) {
 			coord.setX(coord.getX() + speed.getX());
 		} else {
@@ -284,15 +327,56 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private boolean ballHitsPaddle(int x) {
 		boolean found = false;
-		
+
 		int x2 = paddle.getCoordinates().getX();
 		int i = paddle.getWidth();
-		
+
 		if (x < (x2 + i) && x > x2)
 			found = true;
 		else
 			found = false;
-		
+
 		return found;
+	}
+
+	public void openRetryDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+
+		builder.setMessage("Retry?")
+				.setCancelable(false)
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// Reset the level
+								STATE_RUN = STATE_RETRY;
+								STATE_PAUSE = false;
+								resetLevel();
+							}
+						})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						STATE_RUN = STATE_EXIT;
+						STATE_PAUSE = true;
+					}
+				}).show();
+
+	}
+
+	private void victory() {
+		
+		STATE_PAUSE = true;
+		
+		this.activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				openRetryDialog();
+			}
+		});
 	}
 }

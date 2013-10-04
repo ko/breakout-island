@@ -110,14 +110,14 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void addFirstBricks() {
 		// draw initial blocks
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(), 
-				R.drawable.ic_launcher);
+				R.drawable.brick);
 		Brick brick = new Brick(launcher);
 		brick.getCoordinates().setX(150);
 		brick.getCoordinates().setY(100);
 		bricks.add(brick);
 		
 		launcher = BitmapFactory.decodeResource(getResources(), 
-				R.drawable.ic_launcher);
+				R.drawable.brick);
 		brick = new Brick(launcher);
 		brick.getCoordinates().setX(300);
 		brick.getCoordinates().setY(600);
@@ -144,13 +144,12 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void drawPaddle(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
-		int xRight;
 		int xLeft;
 
 		/* getHeight() returns 0 in onCreate() */
 		if (paddle == null) {
 			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-					R.drawable.ic_launcher);
+					R.drawable.paddle);
 			paddle = new Paddle(launcher);
 			paddle.coordinates.setY(getHeight() - launcher.getHeight());
 		}
@@ -158,9 +157,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		bitmap = paddle.getGraphic();
 		coords = paddle.getCoordinates();
 		xLeft = coords.getX();
-		xRight = coords.getX() + paddle.getWidth();
 		canvas.drawBitmap(bitmap, xLeft, coords.getY(), null);
-		canvas.drawBitmap(bitmap, xRight, coords.getY(), null);
 	}
 
 	private void drawBall(Canvas canvas) {
@@ -169,7 +166,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 		if (balls.isEmpty()) {
 			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-					R.drawable.ic_launcher);
+					R.drawable.ball);
 			Ball ball = new Ball(launcher);
 			ball.coordinates.setX(500);
 			ball.coordinates.setY(500);
@@ -205,6 +202,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Graphic.Coordinates coord = ball.getCoordinates();
 		Graphic.Speed speed = ball.getSpeed();
 
+		int paddleLevel = getHeight() - paddle.getGraphic().getHeight();
+		
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
 
@@ -222,13 +221,14 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		// borders for y...
+		/* If we're below paddle height. We'll lose anyways. */
 		if (coord.getY() < 0) {
 			speed.toggleYDirection();
 			coord.setY(-coord.getY());
-		} else if (coord.getY() + ball.getGraphic().getHeight() > getHeight()) {
+		} else if ((coord.getY() + ball.getGraphic().getHeight()) >= paddleLevel) {
 			if (ballHitsPaddle(coord.getX())) {
 				speed.toggleYDirection();
-				coord.setY(coord.getY() + getHeight()
+				coord.setY(coord.getY() + paddleLevel
 						- (coord.getY() + ball.getGraphic().getHeight()));
 			} else {
 				balls.remove(ball);

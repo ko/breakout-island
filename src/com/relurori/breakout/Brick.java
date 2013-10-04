@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 
 public class Brick extends Graphic {
 	
-	private int width = 200;
-	private int height = 100;
+	private int width = 75;
+	private int height = 75;
 	
 	public Brick(Bitmap bitmap) {
 		super(bitmap);

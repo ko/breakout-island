@@ -24,7 +24,7 @@ public class Brick extends Rectangle {
 	public boolean ballHit(Ball ball) {
 		boolean hit = false;
 		
-
+		
 
 		return hit;
 	}

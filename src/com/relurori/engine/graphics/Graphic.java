@@ -1,6 +1,13 @@
-package com.relurori.breakout;
+package com.relurori.engine.graphics;
 
 import java.util.ArrayList;
+
+import com.relurori.engine.graphics.shapes.CORNER;
+import com.relurori.engine.graphics.shapes.Corner;
+import com.relurori.engine.graphics.shapes.Line;
+import com.relurori.engine.graphics.shapes.SLOPE;
+import com.relurori.engine.graphics.shapes.Slope;
+
 
 import android.graphics.Bitmap;
 

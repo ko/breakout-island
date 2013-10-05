@@ -1,4 +1,4 @@
-package com.relurori.breakout;
+package com.relurori.engine.graphics.shapes;
 
 public class CORNER {
 

@@ -1,9 +1,11 @@
 package com.relurori.breakout;
 
+import com.relurori.engine.graphics.shapes.Rectangle;
+
 import android.graphics.Bitmap;
 import android.util.Log;
 
-public class Paddle extends Graphic {
+public class Paddle extends Rectangle {
 
 	private static final String TAG = Paddle.class.getSimpleName();
 	

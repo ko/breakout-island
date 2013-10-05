@@ -2,9 +2,11 @@ package com.relurori.breakout;
 
 import java.util.ArrayList;
 
+import com.relurori.engine.graphics.shapes.Rectangle;
+
 import android.graphics.Bitmap;
 
-public class Brick extends Graphic {
+public class Brick extends Rectangle {
 
 	public Brick(Bitmap bitmap) {
 		super(bitmap);

@@ -1,13 +1,15 @@
 package com.relurori.breakout;
 
+import com.relurori.engine.graphics.shapes.Circle;
+
 import android.graphics.Bitmap;
 
-public class Ball extends Graphic {
+public class Ball extends Circle {
 
 	public Ball(Bitmap bitmap) {
 		super(bitmap);
-		speed.setX(5);
-		speed.setY(5);
+		getSpeed().setX(5);
+		getSpeed().setY(5);
 	}
 
 }

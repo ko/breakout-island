@@ -2,8 +2,9 @@ package com.relurori.breakout;
 
 import java.util.ArrayList;
 
-import com.relurori.breakout.Graphic.Coordinates;
-import com.relurori.breakout.Graphic.Speed;
+import com.relurori.engine.graphics.Graphic;
+import com.relurori.engine.graphics.Graphic.Coordinates;
+import com.relurori.engine.graphics.Graphic.Speed;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -162,8 +163,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.ball);
 		Ball ball = new Ball(launcher);
-		ball.coordinates.setX(500);
-		ball.coordinates.setY(500);
+		ball.getCoordinates().setX(500);
+		ball.getCoordinates().setY(500);
 		balls.add(ball);
 	}
 
@@ -171,7 +172,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.paddle);
 		paddle = new Paddle(launcher);
-		paddle.coordinates.setY(getHeight() - launcher.getHeight());
+		paddle.getCoordinates().setY(getHeight() - launcher.getHeight());
 	}
 
 	private void addFirstBricks() {

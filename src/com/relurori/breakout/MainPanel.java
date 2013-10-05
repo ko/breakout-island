@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -43,7 +44,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private int STATE_RETRY = 2;
 	private int STATE_RUN = STATE_INPROGRESS;
 	private boolean STATE_PAUSE = false;
-	private boolean DEBUG = false;
+	private boolean DEBUG = true;
 	/** affects the victory condition */
 
 	private static float eventDownX = 0;
@@ -120,6 +121,21 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		drawBall(canvas);
 		drawPaddle(canvas);
 		drawBricks(canvas);
+		
+		if (DEBUG) {
+			drawDebug(canvas);
+		}
+	}
+
+	private void drawDebug(Canvas canvas) {
+		Paint paint = new Paint();
+		paint.setStyle(Paint.Style.FILL);
+		paint.setColor(Color.WHITE);
+		
+		for (Brick brick : bricks) {
+			canvas.drawCircle(brick.getCoordinates().getX(), brick.getCoordinates().getY(), 10, paint);
+		}
+		canvas.drawCircle(paddle.getCoordinates().getX(), paddle.getCoordinates().getY(), 10, paint);
 	}
 
 	public int getRunState() {
@@ -166,7 +182,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		brick.getCoordinates().setX(150);
 		brick.getCoordinates().setY(100);
 		bricks.add(brick);
-
+		
 		launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		brick = new Brick(launcher);

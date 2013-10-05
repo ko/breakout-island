@@ -6,8 +6,6 @@ import android.util.Log;
 public class Paddle extends Graphic {
 
 	private static final String TAG = Paddle.class.getSimpleName();
-	private int width = 150;
-	private int height = 26;
 	
 	public Paddle(Bitmap bitmap, int maxY) {
 		super(bitmap, 0, maxY);
@@ -21,11 +19,11 @@ public class Paddle extends Graphic {
 	
 	public int getWidth() {
 		// TODO Auto-generated method stub
-		return width;
+		return bitmap.getWidth();
 	}
 	
 	public int getHeight() {
-		return height;
+		return bitmap.getHeight();
 	}
 
 }

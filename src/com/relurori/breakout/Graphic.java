@@ -1,16 +1,20 @@
 package com.relurori.breakout;
 
+import java.util.ArrayList;
+
 import android.graphics.Bitmap;
 
 public class Graphic {
 	protected Bitmap bitmap;
     protected Coordinates coordinates;
     protected Speed speed;
+    protected Meta meta;
     
     public Graphic(Bitmap bitmap) {
         this.bitmap = bitmap;
         this.coordinates = new Coordinates();
         this.speed = new Speed();
+        this.meta = new Meta();
     }
     
     public Graphic(Bitmap bitmap, int startX, int startY) {
@@ -19,6 +23,10 @@ public class Graphic {
     	this.speed = new Speed();
     }
      
+    public Meta getMeta() {
+    	return meta;
+    }
+    
     public Speed getSpeed() {
         return speed;
     }
@@ -30,7 +38,6 @@ public class Graphic {
     public Coordinates getCoordinates() {
         return coordinates;
     }
- 
 
     public class Speed {
         public static final int X_DIRECTION_RIGHT = 1;
@@ -132,7 +139,7 @@ public class Graphic {
     public class Coordinates {
         private int x;
         private int y;
- 
+        
         public Coordinates() {
         	this.x = 0;
         	this.y = 0;
@@ -162,5 +169,83 @@ public class Graphic {
         public String toString() {
             return "Coordinates: (" + x + "/" + y + ")";
         }
+    }
+    
+    /**
+	 * Meta
+	 * 
+	 * Hold meta information that doesn't necessarily belong in a single class.
+	 * 
+	 * @author ko
+	 * 
+	 */
+    public class Meta {
+    	
+
+        private ArrayList<float[]> corners = new ArrayList<float[]>();;
+    	private ArrayList<Slope> slopes = null;
+
+    	public Meta() {
+    		slopes = new ArrayList<Slope>();
+        	
+        	corners.add(CORNER.NW, Corner.getCornerNW(bitmap,coordinates));
+        	corners.add(CORNER.NE, Corner.getCornerNE(bitmap,coordinates));
+        	corners.add(CORNER.SE, Corner.getCornerSE(bitmap,coordinates));
+        	corners.add(CORNER.SW, Corner.getCornerSW(bitmap,coordinates));
+    	}
+    	
+    	/**
+         * getCorners - get corners of object
+         * @return	array of float[] for corner coordinates start
+         * 			at the top-left and clockwise thereafter.
+         */
+        protected ArrayList<float[]> getCorners() {
+        	return corners;
+        }
+        
+    	
+    	public Graphic.Coordinates lineCollidesWith(Line line1, Line line2) {
+    		Graphic.Coordinates coord = null;
+    		
+    		
+    		
+    		return coord;
+    	}
+    	
+    	
+    	
+        public boolean collidesWith(Graphic that) {
+        	boolean collides = false;
+        			
+    		boolean hitNorth = false;
+    		boolean hitEast = false;
+    		boolean hitSouth = false;
+    		boolean hitWest = false;
+
+    		ArrayList<float[]> thatCorners = that.getMeta().getCorners();
+    		ArrayList<float[]> myCorners = getMeta().getCorners();
+    		
+    		
+    		
+        	return collides;
+        }
+        
+    	public ArrayList<Slope> getSlopes() {
+    		
+    		if (slopes.isEmpty()) {
+
+    			float[] theNW = getMeta().getCorners().get(CORNER.NW);
+    			float[] theSW = getMeta().getCorners().get(CORNER.SW);
+    			float[] theNE = getMeta().getCorners().get(CORNER.NE);
+    			float[] theSE = getMeta().getCorners().get(CORNER.SE);
+    	    	
+    			slopes.add(SLOPE.NORTH,	new Slope(theNW,theNE));
+    			slopes.add(SLOPE.EAST, 	new Slope(theNE,theSE));
+    			slopes.add(SLOPE.SOUTH,	new Slope(theSW,theSE));
+    			slopes.add(SLOPE.WEST, 	new Slope(theNW,theSW));
+    		}
+    		
+    		return slopes;
+    	}
     }
 }

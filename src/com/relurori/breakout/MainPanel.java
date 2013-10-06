@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -52,6 +53,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private static float eventDownY = 0;
 	private static float paddleDownX = 0;
 
+	private Canvas canvas = null;
+	
 	public MainPanel(Context context, Activity activity) {
 		super(context);
 		getHolder().addCallback(this);
@@ -65,6 +68,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		this.activity = activity;
 	}
 
+	public Canvas getCanvas() {
+		return canvas;
+	}
+	
 	@Override
 	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
 		// TODO Auto-generated method stub
@@ -137,6 +144,19 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			canvas.drawCircle(brick.getCoordinates().getX(), brick.getCoordinates().getY(), 10, paint);
 		}
 		canvas.drawCircle(paddle.getCoordinates().getX(), paddle.getCoordinates().getY(), 10, paint);
+
+		int yoff = 20;
+		paint = new Paint();
+		paint.setTextSize(yoff);
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setColor(Color.WHITE);
+		String DEBUG_BALL = "Ball: " + balls.get(0).getCenter().toString();
+		canvas.drawText(DEBUG_BALL, 0, yoff, paint);
+		for (Brick brick : bricks) {
+			yoff += 20;
+			String DEBUG_BRICK = "Brick: " + brick.getCoordinates().toString();
+			canvas.drawText(DEBUG_BRICK, 0, yoff, paint);
+		}
 	}
 
 	public int getRunState() {

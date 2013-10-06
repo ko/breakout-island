@@ -32,7 +32,6 @@ public class Brick extends Rectangle {
 		return hit;
 	}
 
-
 	private boolean isBetween(float x, float lower, float upper) {
 		return (x >= lower && x <= upper);
 	}

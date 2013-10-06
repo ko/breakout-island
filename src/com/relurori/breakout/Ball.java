@@ -12,4 +12,9 @@ public class Ball extends Circle {
 		getSpeed().setY(5);
 	}
 
+	public String toString() {
+		String s = "(x,y)=" + getCenter().getX() + "," + getCenter().getY() + ")";
+		s += " r=" + getRadius();
+		return s;
+	}
 }

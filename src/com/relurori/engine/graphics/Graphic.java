@@ -144,8 +144,8 @@ public class Graphic {
     
     /** Contains the coordinates of the graphic. */
     public class Coordinates {
-        private int x;
-        private int y;
+        private float x;
+        private float y;
         
         public Coordinates() {
         	this.x = 0;
@@ -157,19 +157,19 @@ public class Graphic {
         	setY(y);
         }
         
-        public int getX() {
+        public float getX() {
             return x + bitmap.getWidth() / 2;
         }
  
-        public void setX(int value) {
-            x = value - bitmap.getWidth() / 2;
+        public void setX(float f) {
+            x = f - bitmap.getWidth() / 2;
         }
  
-        public int getY() {
+        public float getY() {
             return y + bitmap.getHeight() / 2;
         }
  
-        public void setY(int value) {
+        public void setY(float value) {
             y = value - bitmap.getHeight() / 2;
         }
  

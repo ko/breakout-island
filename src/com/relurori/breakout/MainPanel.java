@@ -54,6 +54,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private static float eventDownY = 0;
 	private static float paddleDownX = 0;
 
+	private float gameWindowHeight = 800;
+	
 	private Canvas canvas = null;
 	private String cacheMsg = null;
 	
@@ -114,10 +116,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				float deltaY = event.getY() - eventDownY;
 
 				paddle.getCoordinates().setX(
-						(int) deltaX + (int) paddleDownX
+						deltaX + paddleDownX
 								+ paddle.getGraphic().getWidth() / 2);
 				paddle.getCoordinates().setY(
-						getHeight() - paddle.getGraphic().getHeight());
+						gameWindowHeight - paddle.getGraphic().getHeight());
 			}
 
 			return true;
@@ -175,7 +177,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	private void setMessage(String m) {
-		cacheMsg = m;
+		if (!m.equals(cacheMsg))
+			cacheMsg = m;
 	}
 
 	public int getRunState() {
@@ -211,7 +214,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.paddle);
 		paddle = new Paddle(launcher);
-		paddle.getCoordinates().setY(getHeight() - launcher.getHeight());
+		paddle.getCoordinates().setY(gameWindowHeight - launcher.getHeight());
 	}
 
 	private void addFirstBricks() {
@@ -251,7 +254,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void drawPaddle(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
-		int xLeft;
+		float xLeft;
 
 		/* getHeight() returns 0 in onCreate() */
 		if (paddle == null) {
@@ -301,7 +304,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Graphic.Coordinates coord = ball.getCoordinates();
 		Graphic.Speed speed = ball.getSpeed();
 
-		int paddleLevel = getHeight() - paddle.getGraphic().getHeight();
+		float paddleLevel = gameWindowHeight - paddle.getGraphic().getHeight();
 
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
@@ -355,7 +358,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				it.remove();
 				s.toggleXDirection();
 				s.toggleYDirection();
-				if (bricks.isEmpty() == true) {
+				if (it.hasNext() == false) {
+					Log.d(TAG,"victory");
+					setMessage("victory()");
 					victory();
 				}
 			}

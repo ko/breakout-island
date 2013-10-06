@@ -54,6 +54,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private static float paddleDownX = 0;
 
 	private Canvas canvas = null;
+	private String cacheMsg = null;
 	
 	public MainPanel(Context context, Activity activity) {
 		super(context);
@@ -131,6 +132,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		drawBricks(canvas);
 		
 		if (DEBUG) {
+			this.canvas = canvas;
 			drawDebug(canvas);
 		}
 	}
@@ -150,13 +152,29 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		paint.setTextSize(yoff);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setColor(Color.WHITE);
-		String DEBUG_BALL = "Ball: " + balls.get(0).getCenter().toString();
+		String DEBUG_BALL = "Ball: " + balls.get(0).toString();
 		canvas.drawText(DEBUG_BALL, 0, yoff, paint);
 		for (Brick brick : bricks) {
 			yoff += 20;
 			String DEBUG_BRICK = "Brick: " + brick.getCoordinates().toString();
 			canvas.drawText(DEBUG_BRICK, 0, yoff, paint);
 		}
+		
+		drawMessage();
+	}
+	
+	private void drawMessage() {
+		if (cacheMsg != null) {
+			Paint paint = new Paint();
+			paint.setTextSize(20);
+			paint.setStyle(Paint.Style.STROKE);
+			paint.setColor(Color.WHITE);
+			getCanvas().drawText(cacheMsg, 0, 80, paint);
+		}
+	}
+	
+	private void setMessage(String m) {
+		cacheMsg = m;
 	}
 
 	public int getRunState() {
@@ -329,6 +347,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 		for (Brick brick : bricks) {
 			if (ballHitBrick(ball, brick)) {
+				if (cacheMsg == null) {
+					setMessage("ballHitBrick()");
+				}
 				bricks.remove(brick);
 				s.toggleXDirection();
 				s.toggleYDirection();

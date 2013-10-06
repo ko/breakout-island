@@ -1,6 +1,7 @@
 package com.relurori.breakout;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.relurori.engine.graphics.Graphic;
 import com.relurori.engine.graphics.Graphic.Coordinates;
@@ -345,12 +346,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private Graphic.Speed ballHitBricks(Ball ball, Graphic.Speed speed) {
 		Graphic.Speed s = speed;
 
-		for (Brick brick : bricks) {
+		for (Iterator<Brick> it = bricks.iterator(); it.hasNext(); ) {
+			Brick brick = it.next();
 			if (ballHitBrick(ball, brick)) {
 				if (cacheMsg == null) {
 					setMessage("ballHitBrick()");
 				}
-				bricks.remove(brick);
+				it.remove();
 				s.toggleXDirection();
 				s.toggleYDirection();
 				if (bricks.isEmpty() == true) {

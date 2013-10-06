@@ -286,7 +286,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			speed.toggleYDirection();
 			coord.setY(-coord.getY());
 		} else if ((coord.getY() + ball.getGraphic().getHeight()) >= paddleLevel) {
-			if (ballHitsPaddle(coord.getX())) {
+			if (ballHitPaddle(ball)) {
 				speed.toggleYDirection();
 				coord.setY(coord.getY() + paddleLevel
 						- (coord.getY() + ball.getGraphic().getHeight()));
@@ -342,18 +342,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		return coord;
 	}
 
-	private boolean ballHitsPaddle(int x) {
-		boolean found = false;
-
-		int x2 = paddle.getCoordinates().getX();
-		int i = paddle.getWidth();
-
-		if (x < (x2 + i) && x > x2)
-			found = true;
-		else
-			found = false;
-
-		return found;
+	private boolean ballHitPaddle(Ball ball) {
+		boolean hit = paddle.ballHit(ball);
+		Log.d(TAG,"paddle hit=" + hit);
+		return hit;
 	}
 
 	public void openRetryDialog() {

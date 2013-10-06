@@ -153,8 +153,8 @@ public class Graphic {
         }
         
         public Coordinates(int x, int y) {
-        	this.x = x;
-        	this.y = y;
+        	setX(x);
+        	setY(y);
         }
         
         public int getX() {
@@ -189,52 +189,38 @@ public class Graphic {
     public class Meta {
     	
 
-        private ArrayList<float[]> corners = new ArrayList<float[]>();;
+        private ArrayList<float[]> corners = null;
     	private ArrayList<Slope> slopes = null;
 
     	public Meta() {
     		slopes = new ArrayList<Slope>();
-        	
-        	corners.add(CORNER.NW, Corner.getCornerNW(bitmap,coordinates));
-        	corners.add(CORNER.NE, Corner.getCornerNE(bitmap,coordinates));
-        	corners.add(CORNER.SE, Corner.getCornerSE(bitmap,coordinates));
-        	corners.add(CORNER.SW, Corner.getCornerSW(bitmap,coordinates));
+    		corners = new ArrayList<float[]>();
     	}
     	
+    	public ArrayList<float[]> getCorners() {
+	    	if (corners.isEmpty()) {
+	    		updateCorners();
+	    	}
+	    	return corners;
+    	}
+    	
+    	public ArrayList<float[]> getCorners(boolean cached) {
+    		if (corners.isEmpty() || cached == false) {
+    			updateCorners();
+    		}
+    		return corners;
+    	}
     	/**
-         * getCorners - get corners of object
+         * getCorners - get new/updated corners of object
          * @return	array of float[] for corner coordinates start
          * 			at the top-left and clockwise thereafter.
          */
-        protected ArrayList<float[]> getCorners() {
-        	return corners;
-        }
-        
-    	
-    	public Graphic.Coordinates lineCollidesWith(Line line1, Line line2) {
-    		Graphic.Coordinates coord = null;
-    		
-    		
-    		
-    		return coord;
-    	}
-    	
-    	
-    	
-        public boolean collidesWith(Graphic that) {
-        	boolean collides = false;
-        			
-    		boolean hitNorth = false;
-    		boolean hitEast = false;
-    		boolean hitSouth = false;
-    		boolean hitWest = false;
-
-    		ArrayList<float[]> thatCorners = that.getMeta().getCorners();
-    		ArrayList<float[]> myCorners = getMeta().getCorners();
-    		
-    		
-    		
-        	return collides;
+        private void updateCorners() {
+        	corners.clear();
+        	corners.add(CORNER.NW, Corner.getCornerNW(bitmap,getCoordinates()));
+        	corners.add(CORNER.NE, Corner.getCornerNE(bitmap,getCoordinates()));
+        	corners.add(CORNER.SE, Corner.getCornerSE(bitmap,getCoordinates()));
+        	corners.add(CORNER.SW, Corner.getCornerSW(bitmap,getCoordinates()));
         }
         
     	public ArrayList<Slope> getSlopes() {

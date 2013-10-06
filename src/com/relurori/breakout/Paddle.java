@@ -1,5 +1,7 @@
 package com.relurori.breakout;
 
+import com.relurori.engine.graphics.shapes.Collision;
+import com.relurori.engine.graphics.shapes.Intersection;
 import com.relurori.engine.graphics.shapes.Rectangle;
 
 import android.graphics.Bitmap;
@@ -26,6 +28,16 @@ public class Paddle extends Rectangle {
 	
 	public int getHeight() {
 		return bitmap.getHeight();
+	}
+
+	public boolean ballHit(Ball ball) {
+		boolean hit = false;
+		
+		Intersection intersect = Collision.between(ball,this);
+		hit = intersect.getIntersect();
+		
+		Log.d(TAG, "NW=" + getCoordinates().getX() + "," + getCoordinates().getY());
+		return hit;
 	}
 
 }

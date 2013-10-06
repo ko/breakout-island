@@ -2,6 +2,8 @@ package com.relurori.breakout;
 
 import java.util.ArrayList;
 
+import com.relurori.engine.graphics.shapes.Collision;
+import com.relurori.engine.graphics.shapes.Intersection;
 import com.relurori.engine.graphics.shapes.Rectangle;
 
 import android.graphics.Bitmap;
@@ -24,8 +26,9 @@ public class Brick extends Rectangle {
 	public boolean ballHit(Ball ball) {
 		boolean hit = false;
 		
+		Intersection intersect = Collision.between(ball,this);
+		hit = intersect.getIntersect();
 		
-
 		return hit;
 	}
 

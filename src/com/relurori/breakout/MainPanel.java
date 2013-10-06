@@ -3,6 +3,7 @@ package com.relurori.breakout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.relurori.breakout.engine.graphics.shapes.Joystick;
 import com.relurori.engine.graphics.Graphic;
 import com.relurori.engine.graphics.Graphic.Coordinates;
 import com.relurori.engine.graphics.Graphic.Speed;
@@ -41,6 +42,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private ArrayList<Brick> bricks = new ArrayList<Brick>();
 	private Graphic currentGraphic = null;
 	private Paddle paddle = null;
+	private Joystick joystick = null;
 
 	private int STATE_INPROGRESS = 0;
 	private int STATE_EXIT = 1;
@@ -133,6 +135,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		drawBall(canvas);
 		drawPaddle(canvas);
 		drawBricks(canvas);
+		drawJoystick(canvas);
 		
 		if (DEBUG) {
 			this.canvas = canvas;
@@ -233,7 +236,34 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		brick.getCoordinates().setY(600);
 		bricks.add(brick);
 	}
+	
+	private void addFirstJoystick() {
 
+		float x = (getWidth() / 2);
+		float y = (getHeight() + gameWindowHeight)/2;
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+				R.drawable.jstick);
+		
+		x = x - (bitmap.getWidth()/2);
+		y = y - (bitmap.getHeight()/2);
+		
+		joystick = new Joystick(bitmap);
+		joystick.getCoordinates().setX(x);
+		joystick.getCoordinates().setY(y);
+	}
+	
+	private void drawJoystick(Canvas canvas) {
+		
+		if (joystick == null) {
+			addFirstJoystick();
+		}
+		Bitmap bitmap = joystick.getGraphic();
+		float x = joystick.getCoordinates().getX();
+		float y = joystick.getCoordinates().getY();
+		
+		canvas.drawBitmap(bitmap, x, y, null);
+	}
+	
 	private void drawBricks(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
@@ -283,7 +313,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void updatePhysics() {
-
 		for (Ball ball : balls) {
 			updateBallPhysics(ball);
 		}
@@ -348,7 +377,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	private Graphic.Speed ballHitBricks(Ball ball, Graphic.Speed speed) {
 		Graphic.Speed s = speed;
-
+		
 		for (Iterator<Brick> it = bricks.iterator(); it.hasNext(); ) {
 			Brick brick = it.next();
 			if (ballHitBrick(ball, brick)) {
@@ -358,7 +387,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				it.remove();
 				s.toggleXDirection();
 				s.toggleYDirection();
-				if (it.hasNext() == false) {
+				if (bricks.isEmpty()) {
 					Log.d(TAG,"victory");
 					setMessage("victory()");
 					victory();
@@ -399,6 +428,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	public void openRetryDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
 
+		Log.d(TAG,"Building dialog");
+		
 		builder.setMessage("Retry?")
 				.setCancelable(false)
 				.setPositiveButton("Yes",

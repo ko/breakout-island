@@ -106,22 +106,23 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		synchronized (thread.getSurfaceHolder()) {
-
-			Graphic graphic = null;
-
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 				eventDownX = event.getX();
 				eventDownY = event.getY();
-				paddleDownX = paddle.getCoordinates().getX();
+
+				if (joystick.pressed(event.getX(),event.getY())) {
+					joystick.setRestingState(false);
+				}
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				float deltaX = event.getX() - eventDownX;
 				float deltaY = event.getY() - eventDownY;
-
-				paddle.getCoordinates().setX(
-						deltaX + paddleDownX
-								+ paddle.getGraphic().getWidth() / 2);
-				paddle.getCoordinates().setY(
-						gameWindowHeight - paddle.getGraphic().getHeight());
+				
+				if (joystick.getRestingState() == false) {
+					joystick.getCoordinates().setX(joystick.getRestingX() + deltaX);
+					joystick.getCoordinates().setY(joystick.getCoordinates().getY() + deltaY);
+				}
+			} else if (event.getAction() == MotionEvent.ACTION_UP) {
+				joystick.setToRestingState();
 			}
 
 			return true;
@@ -247,7 +248,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		x = x - (bitmap.getWidth()/2);
 		y = y - (bitmap.getHeight()/2);
 		
-		joystick = new Joystick(bitmap);
+		joystick = new Joystick(bitmap, x, y);
 		joystick.getCoordinates().setX(x);
 		joystick.getCoordinates().setY(y);
 	}
@@ -262,6 +263,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		float y = joystick.getCoordinates().getY();
 		
 		canvas.drawBitmap(bitmap, x, y, null);
+		
+		if (joystick.getDirection() != Joystick.MOVEMENT_STOP)
+			Log.d(TAG,"joystick=" + joystick.toString());
 	}
 	
 	private void drawBricks(Canvas canvas) {
@@ -318,11 +322,26 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		}
 		if (paddle != null)
 			updatePaddlePhysics();
+		if (joystick != null) 
+			updateJoystickPhysics();
+	}
+
+	private void updateJoystickPhysics() {
+		joystick.getCoordinates().setY(joystick.getRestingY());
 	}
 
 	private void updatePaddlePhysics() {
 		Graphic.Coordinates coord = paddle.getCoordinates();
-
+		float deltaX = paddle.getCoordinates().getX();
+		
+		if (joystick.getDirection() == Joystick.MOVEMENT_EAST) {
+			deltaX += 10;
+		} else if (joystick.getDirection() == Joystick.MOVEMENT_WEST) {
+			deltaX -= 10;
+		}
+		
+		paddle.getCoordinates().setX(deltaX);
+		
 		if (coord.getX() < 0)
 			paddle.getCoordinates().setX(0);
 		else if ((coord.getX() + paddle.getWidth()) > getWidth())
@@ -421,7 +440,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private boolean ballHitPaddle(Ball ball) {
 		boolean hit = paddle.ballHit(ball);
-		Log.d(TAG,"paddle hit=" + hit);
 		return hit;
 	}
 

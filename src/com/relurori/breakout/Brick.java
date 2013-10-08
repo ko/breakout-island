@@ -23,13 +23,8 @@ public class Brick extends Rectangle {
 	 * @param ball
 	 * @return
 	 */
-	public boolean ballHit(Ball ball) {
-		boolean hit = false;
-		
-		Intersection intersect = Collision.between(ball,this);
-		hit = intersect.getIntersect();
-		
-		return hit;
+	public Intersection ballHit(Ball ball) {
+		return Collision.between(ball, this);
 	}
 
 	private boolean isBetween(float x, float lower, float upper) {

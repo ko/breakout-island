@@ -5,6 +5,7 @@ public class Intersection {
 	private boolean intersect;
 	private float x;
 	private float y;
+	private int face;
 	
 	public Intersection() {
 		intersect = false;
@@ -34,5 +35,13 @@ public class Intersection {
 	
 	public float getY() {
 		return this.y;
+	}
+	
+	public void setFace(int i) {
+		face = i;
+	}
+	
+	public int getFace() {
+		return face;
 	}
 }

@@ -7,6 +7,8 @@ import com.relurori.breakout.engine.graphics.shapes.Joystick;
 import com.relurori.engine.graphics.Graphic;
 import com.relurori.engine.graphics.Graphic.Coordinates;
 import com.relurori.engine.graphics.Graphic.Speed;
+import com.relurori.engine.graphics.shapes.Collision;
+import com.relurori.engine.graphics.shapes.Intersection;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -278,7 +280,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 
-		for (Brick brick : bricks) {
+		for (Iterator<Brick> it = bricks.iterator(); it.hasNext(); ) {
+			Brick brick = it.next();
 			bitmap = brick.getGraphic();
 			coords = brick.getCoordinates();
 			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
@@ -308,7 +311,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (balls.isEmpty()) {
 			addFirstBalls();
 		}
-		for (Ball ball : balls) {
+
+		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
+			Ball ball = it.next();
 			bitmap = ball.getGraphic();
 			coords = ball.getCoordinates();
 			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
@@ -317,7 +322,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void updatePhysics() {
-		for (Ball ball : balls) {
+		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
+			Ball ball = it.next();
 			updateBallPhysics(ball);
 		}
 		if (paddle != null)
@@ -396,28 +402,51 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	private Graphic.Speed ballHitBricks(Ball ball, Graphic.Speed speed) {
 		Graphic.Speed s = speed;
-		
+		Intersection i = null;
 		for (Iterator<Brick> it = bricks.iterator(); it.hasNext(); ) {
 			Brick brick = it.next();
-			if (ballHitBrick(ball, brick)) {
-				if (cacheMsg == null) {
+			i = ballHitBrick(ball, brick);
+			if (i.getIntersect() == true) {
+				
+				if (DEBUG && cacheMsg == null) {
 					setMessage("ballHitBrick()");
 				}
-				it.remove();
-				s.toggleXDirection();
-				s.toggleYDirection();
-				if (bricks.isEmpty()) {
+				
+
+				if (it.hasNext() == false) {
 					Log.d(TAG,"victory");
 					setMessage("victory()");
 					victory();
 				}
+				it.remove();
+				
+				switch(i.getFace()) {
+				case Collision.EAST_FACE:
+				case Collision.WEST_FACE:
+					s.toggleXDirection();
+					break;
+				case Collision.NORTH_FACE:
+				case Collision.SOUTH_FACE:
+					s.toggleYDirection();
+					break;
+				case Collision.NE_CORNER:
+				case Collision.SE_CORNER:
+				case Collision.SW_CORNER:
+				case Collision.NW_CORNER:
+				default:
+					s.toggleXDirection();
+					s.toggleYDirection();
+					break;
+				}
+				
+
 			}
 		}
 
 		return s;
 	}
 
-	private boolean ballHitBrick(Ball ball, Brick brick) {
+	private Intersection ballHitBrick(Ball ball, Brick brick) {
 
 		return brick.ballHit(ball);
 	}

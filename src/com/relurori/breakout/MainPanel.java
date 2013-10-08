@@ -58,7 +58,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private static float eventDownY = 0;
 	private static float paddleDownX = 0;
 
-	private float gameWindowHeight = 800;
+	private float gameWindowWidth = 800;
 	
 	private Canvas canvas = null;
 	private String cacheMsg = null;
@@ -120,8 +120,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				float deltaY = event.getY() - eventDownY;
 				
 				if (joystick.getRestingState() == false) {
-					joystick.getCoordinates().setX(joystick.getRestingX() + deltaX);
-					joystick.getCoordinates().setY(joystick.getCoordinates().getY() + deltaY);
+					joystick.getCoordinates().setX(joystick.getCoordinates().getX() + deltaX);
+					joystick.getCoordinates().setY(joystick.getRestingY() + deltaY);
 				}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				joystick.setToRestingState();
@@ -220,7 +220,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.paddle);
 		paddle = new Paddle(launcher);
-		paddle.getCoordinates().setY(gameWindowHeight - launcher.getHeight());
+		paddle.getCoordinates().setX(gameWindowWidth - launcher.getWidth());
 	}
 
 	private void addFirstBricks() {
@@ -228,22 +228,22 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		Brick brick = new Brick(launcher);
-		brick.getCoordinates().setX(150);
-		brick.getCoordinates().setY(100);
+		brick.getCoordinates().setX(100);
+		brick.getCoordinates().setY(150);
 		bricks.add(brick);
 		
 		launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		brick = new Brick(launcher);
-		brick.getCoordinates().setX(300);
-		brick.getCoordinates().setY(600);
+		brick.getCoordinates().setX(600);
+		brick.getCoordinates().setY(300);
 		bricks.add(brick);
 	}
 	
 	private void addFirstJoystick() {
 
-		float x = (getWidth() / 2);
-		float y = (getHeight() + gameWindowHeight)/2;
+		float x = (getWidth() + gameWindowWidth) / 2;
+		float y = (getHeight()/2);
 		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
 				R.drawable.jstick);
 		
@@ -300,8 +300,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 		bitmap = paddle.getGraphic();
 		coords = paddle.getCoordinates();
-		xLeft = coords.getX();
-		canvas.drawBitmap(bitmap, xLeft, coords.getY(), null);
+		canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
 	}
 
 	private void drawBall(Canvas canvas) {
@@ -333,32 +332,32 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void updateJoystickPhysics() {
-		joystick.getCoordinates().setY(joystick.getRestingY());
+		joystick.getCoordinates().setX(joystick.getRestingX());
 	}
 
 	private void updatePaddlePhysics() {
 		Graphic.Coordinates coord = paddle.getCoordinates();
-		float deltaX = paddle.getCoordinates().getX();
+		float deltaY = paddle.getCoordinates().getY();
 		
-		if (joystick.getDirection() == Joystick.MOVEMENT_EAST) {
-			deltaX += 10;
-		} else if (joystick.getDirection() == Joystick.MOVEMENT_WEST) {
-			deltaX -= 10;
+		if (joystick.getDirection() == Joystick.MOVEMENT_SOUTH) {
+			deltaY += 20;
+		} else if (joystick.getDirection() == Joystick.MOVEMENT_NORTH) {
+			deltaY -= 20;
 		}
 		
-		paddle.getCoordinates().setX(deltaX);
+		paddle.getCoordinates().setY(deltaY);
 		
-		if (coord.getX() < 0)
-			paddle.getCoordinates().setX(0);
-		else if ((coord.getX() + paddle.getWidth()) > getWidth())
-			paddle.getCoordinates().setX(getWidth() - paddle.getWidth());
+		if (coord.getY() < 0)
+			paddle.getCoordinates().setY(0);
+		else if ((coord.getY() + paddle.getHeight()) > getHeight())
+			paddle.getCoordinates().setY(getHeight() - paddle.getHeight());
 	}
 
 	private void updateBallPhysics(Ball ball) {
 		Graphic.Coordinates coord = ball.getCoordinates();
 		Graphic.Speed speed = ball.getSpeed();
 
-		float paddleLevel = gameWindowHeight - paddle.getGraphic().getHeight();
+		float paddleLevel = gameWindowWidth - paddle.getGraphic().getWidth();
 
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
@@ -370,10 +369,14 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (coord.getX() < 0) {
 			speed.toggleXDirection();
 			coord.setX(-coord.getX());
-		} else if (coord.getX() + ball.getGraphic().getWidth() > getWidth()) {
-			speed.toggleXDirection();
-			coord.setX(coord.getX() + getWidth()
-					- (coord.getX() + ball.getGraphic().getWidth()));
+		} else if (coord.getX() + ball.getGraphic().getWidth() > paddleLevel) {
+			if (ballHitPaddle(ball)) {
+				speed.toggleXDirection();
+				coord.setX(coord.getX() + paddleLevel
+						- (coord.getX() + ball.getGraphic().getWidth()));
+			} else {
+				balls.remove(ball);
+			}
 		}
 
 		// borders for y...
@@ -381,14 +384,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (coord.getY() < 0) {
 			speed.toggleYDirection();
 			coord.setY(-coord.getY());
-		} else if ((coord.getY() + ball.getGraphic().getHeight()) >= paddleLevel) {
-			if (ballHitPaddle(ball)) {
-				speed.toggleYDirection();
-				coord.setY(coord.getY() + paddleLevel
-						- (coord.getY() + ball.getGraphic().getHeight()));
-			} else {
-				balls.remove(ball);
-			}
+		} else if ((coord.getY() + ball.getGraphic().getHeight()) >= getHeight()) {
+			speed.toggleYDirection();
+			coord.setY(coord.getY() + getHeight()
+					- (coord.getY() + ball.getGraphic().getHeight()));
 		}
 	}
 

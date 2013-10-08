@@ -80,6 +80,10 @@ public class Joystick extends InputSystem {
 			return MOVEMENT_EAST;
 		if (getDeltaX() < 0)
 			return MOVEMENT_WEST;
+		if (getDeltaY() < 0) 
+			return MOVEMENT_NORTH;
+		if (getDeltaY() > 0)
+			return MOVEMENT_SOUTH;
 		return MOVEMENT_STOP;
 	}
 	

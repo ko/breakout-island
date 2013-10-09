@@ -1,8 +1,12 @@
 package com.relurori.breakout;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
@@ -30,7 +34,7 @@ public class MainActivity extends Activity {
 		Log.d(TAG, "Setting content view");
 		setContentView(new MainPanel(this, MainActivity.this));
 
-		Log.d(TAG, "Main game panel view added");
+		Log.d(TAG, "Main game panel view added");		
 	}
 
 

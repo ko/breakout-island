@@ -13,8 +13,6 @@ public class Paddle extends Rectangle {
 	
 	public Paddle(Bitmap bitmap, int maxY) {
 		super(bitmap, 0, maxY);
-		Log.d(TAG, "maxY=" + maxY);
-		Log.d(TAG, "Paddle: " + this.coordinates.toString());
 	}
 
 	public Paddle(Bitmap bitmap) {
@@ -31,13 +29,7 @@ public class Paddle extends Rectangle {
 	}
 
 	public boolean ballHit(Ball ball) {
-		boolean hit = false;
-		
-		Intersection intersect = Collision.between(ball,this);
-		hit = intersect.getIntersect();
-		
-		Log.d(TAG, "NW=" + getCoordinates().getX() + "," + getCoordinates().getY());
-		return hit;
+		return Collision.between(ball,this).getIntersect();
 	}
 
 }

@@ -1,6 +1,9 @@
-package com.relurori.engine.graphics.shapes;
+package com.relurori.engine.graphics.shapes.meta;
 
 import java.util.ArrayList;
+
+import com.relurori.engine.graphics.shapes.Circle;
+import com.relurori.engine.graphics.shapes.Rectangle;
 
 import android.util.Log;
 
@@ -29,9 +32,9 @@ public class Collision {
 		
 		ArrayList<float[]> corners = rect.getMeta().getCorners(false);
 		
-		float[] rnw = corners.get(CORNER.NW);
-		float[] rne = corners.get(CORNER.NE);
-		float[] rsw = corners.get(CORNER.SW);
+		float[] rnw = corners.get(Corner.NW);
+		float[] rne = corners.get(Corner.NE);
+		float[] rsw = corners.get(Corner.SW);
 		
 		float rnwx = rnw[0];
 		float rnwy = rnw[1];

@@ -1,7 +1,12 @@
-package com.relurori.engine.graphics.shapes;
+package com.relurori.engine.math;
 
 public class Slope {
 
+	public static final int NORTH = 0;
+	public static final int EAST = 1;
+	public static final int SOUTH = 2;
+	public static final int WEST = 3;
+	
 	private boolean isVertical;
 	private float rise;
 	private float run;

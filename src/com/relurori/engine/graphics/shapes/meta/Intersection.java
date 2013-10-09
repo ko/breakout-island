@@ -1,4 +1,4 @@
-package com.relurori.engine.graphics.shapes;
+package com.relurori.engine.graphics.shapes.meta;
 
 public class Intersection {
 	

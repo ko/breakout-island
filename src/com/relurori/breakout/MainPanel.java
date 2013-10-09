@@ -3,12 +3,12 @@ package com.relurori.breakout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.relurori.breakout.engine.graphics.shapes.Joystick;
 import com.relurori.engine.graphics.Graphic;
 import com.relurori.engine.graphics.Graphic.Coordinates;
 import com.relurori.engine.graphics.Graphic.Speed;
-import com.relurori.engine.graphics.shapes.Collision;
-import com.relurori.engine.graphics.shapes.Intersection;
+import com.relurori.engine.graphics.shapes.meta.Collision;
+import com.relurori.engine.graphics.shapes.meta.Intersection;
+import com.relurori.engine.io.Joystick;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -442,29 +442,34 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				}
 				it.remove();
 				
-				switch(i.getFace()) {
-				case Collision.EAST_FACE:
-				case Collision.WEST_FACE:
-					s.toggleXDirection();
-					break;
-				case Collision.NORTH_FACE:
-				case Collision.SOUTH_FACE:
-					s.toggleYDirection();
-					break;
-				case Collision.NE_CORNER:
-				case Collision.SE_CORNER:
-				case Collision.SW_CORNER:
-				case Collision.NW_CORNER:
-				default:
-					s.toggleXDirection();
-					s.toggleYDirection();
-					break;
-				}
-				
-
+				s = ballHitFaceToggleDirection(s,i);
 			}
 		}
 
+		return s;
+	}
+
+	private Speed ballHitFaceToggleDirection(Graphic.Speed s, Intersection i) {
+		
+		switch(i.getFace()) {
+		case Collision.EAST_FACE:
+		case Collision.WEST_FACE:
+			s.toggleXDirection();
+			break;
+		case Collision.NORTH_FACE:
+		case Collision.SOUTH_FACE:
+			s.toggleYDirection();
+			break;
+		case Collision.NE_CORNER:
+		case Collision.SE_CORNER:
+		case Collision.SW_CORNER:
+		case Collision.NW_CORNER:
+		default:
+			s.toggleXDirection();
+			s.toggleYDirection();
+			break;
+		}
+		
 		return s;
 	}
 

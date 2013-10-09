@@ -1,4 +1,4 @@
-package com.relurori.engine.graphics.shapes;
+package com.relurori.engine.graphics.shapes.generic;
 
 import com.relurori.engine.graphics.Graphic;
 

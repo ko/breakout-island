@@ -1,4 +1,6 @@
-package com.relurori.breakout.engine.graphics.shapes;
+package com.relurori.engine.io;
+
+import com.relurori.engine.io.generic.InputSystem;
 
 import android.graphics.Bitmap;
 

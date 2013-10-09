@@ -1,5 +1,7 @@
 package com.relurori.engine.graphics.shapes;
 
+import com.relurori.engine.graphics.shapes.meta.Intersection;
+
 public class Line {
 	
 	private float x1;

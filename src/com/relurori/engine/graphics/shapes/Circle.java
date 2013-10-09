@@ -1,6 +1,7 @@
 package com.relurori.engine.graphics.shapes;
 
 import com.relurori.engine.graphics.Graphic;
+import com.relurori.engine.graphics.shapes.generic.Polygon;
 
 import android.graphics.Bitmap;
 

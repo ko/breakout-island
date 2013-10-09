@@ -2,9 +2,9 @@ package com.relurori.breakout;
 
 import java.util.ArrayList;
 
-import com.relurori.engine.graphics.shapes.Collision;
-import com.relurori.engine.graphics.shapes.Intersection;
 import com.relurori.engine.graphics.shapes.Rectangle;
+import com.relurori.engine.graphics.shapes.meta.Collision;
+import com.relurori.engine.graphics.shapes.meta.Intersection;
 
 import android.graphics.Bitmap;
 

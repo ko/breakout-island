@@ -1,4 +1,4 @@
-package com.relurori.engine.graphics.shapes;
+package com.relurori.engine.graphics.shapes.meta;
 
 
 import com.relurori.engine.graphics.Graphic;
@@ -7,6 +7,11 @@ import android.graphics.Bitmap;
 
 public class Corner {
 	
+    public static final int NW = 0;
+    public static final int NE = 1;
+    public static final int SE = 2;
+    public static final int SW = 3;
+    
 	public static float[] getCornerSW(Bitmap bitmap, Graphic.Coordinates coordinates) {
 		float llx = coordinates.getX();
 		float lly = coordinates.getY() + bitmap.getHeight();

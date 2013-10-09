@@ -2,11 +2,9 @@ package com.relurori.engine.graphics;
 
 import java.util.ArrayList;
 
-import com.relurori.engine.graphics.shapes.CORNER;
-import com.relurori.engine.graphics.shapes.Corner;
 import com.relurori.engine.graphics.shapes.Line;
-import com.relurori.engine.graphics.shapes.SLOPE;
-import com.relurori.engine.graphics.shapes.Slope;
+import com.relurori.engine.graphics.shapes.meta.Corner;
+import com.relurori.engine.math.Slope;
 
 
 import android.graphics.Bitmap;
@@ -217,25 +215,25 @@ public class Graphic {
          */
         private void updateCorners() {
         	corners.clear();
-        	corners.add(CORNER.NW, Corner.getCornerNW(bitmap,getCoordinates()));
-        	corners.add(CORNER.NE, Corner.getCornerNE(bitmap,getCoordinates()));
-        	corners.add(CORNER.SE, Corner.getCornerSE(bitmap,getCoordinates()));
-        	corners.add(CORNER.SW, Corner.getCornerSW(bitmap,getCoordinates()));
+        	corners.add(Corner.NW, Corner.getCornerNW(bitmap,getCoordinates()));
+        	corners.add(Corner.NE, Corner.getCornerNE(bitmap,getCoordinates()));
+        	corners.add(Corner.SE, Corner.getCornerSE(bitmap,getCoordinates()));
+        	corners.add(Corner.SW, Corner.getCornerSW(bitmap,getCoordinates()));
         }
         
     	public ArrayList<Slope> getSlopes() {
     		
     		if (slopes.isEmpty()) {
 
-    			float[] theNW = getMeta().getCorners().get(CORNER.NW);
-    			float[] theSW = getMeta().getCorners().get(CORNER.SW);
-    			float[] theNE = getMeta().getCorners().get(CORNER.NE);
-    			float[] theSE = getMeta().getCorners().get(CORNER.SE);
+    			float[] theNW = getMeta().getCorners().get(Corner.NW);
+    			float[] theSW = getMeta().getCorners().get(Corner.SW);
+    			float[] theNE = getMeta().getCorners().get(Corner.NE);
+    			float[] theSE = getMeta().getCorners().get(Corner.SE);
     	    	
-    			slopes.add(SLOPE.NORTH,	new Slope(theNW,theNE));
-    			slopes.add(SLOPE.EAST, 	new Slope(theNE,theSE));
-    			slopes.add(SLOPE.SOUTH,	new Slope(theSW,theSE));
-    			slopes.add(SLOPE.WEST, 	new Slope(theNW,theSW));
+    			slopes.add(Slope.NORTH,	new Slope(theNW,theNE));
+    			slopes.add(Slope.EAST, 	new Slope(theNE,theSE));
+    			slopes.add(Slope.SOUTH,	new Slope(theSW,theSE));
+    			slopes.add(Slope.WEST, 	new Slope(theNW,theSW));
     		}
     		
     		return slopes;

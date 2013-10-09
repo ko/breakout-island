@@ -433,7 +433,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				}
 				
 				ballHitSound();
-				
+
 
 				if (it.hasNext() == false) {
 					Log.d(TAG,"victory");

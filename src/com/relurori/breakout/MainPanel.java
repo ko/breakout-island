@@ -20,6 +20,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,6 +48,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private Graphic currentGraphic = null;
 	private Paddle paddle = null;
 	private Joystick joystick = null;
+	
+	private SoundPool sp = null;
 
 	private int STATE_INPROGRESS = 0;
 	private int STATE_EXIT = 1;
@@ -74,6 +79,19 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 		this.context = context;
 		this.activity = activity;
+		
+		sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+		int sid = sp.load(getContext(), R.raw.hit, 1);
+		boolean loaded = false;
+		sp.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+			
+			@Override
+			public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+				soundPool.play(sampleId, 1.0f, 1.0f, 1, 0, 1.0f);
+				Log.d(TAG,"onLoadComplete sid=" + sampleId);
+				
+			}
+		});
 	}
 
 	public Canvas getCanvas() {
@@ -371,6 +389,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			coord.setX(-coord.getX());
 		} else if (coord.getX() + ball.getGraphic().getWidth() > paddleLevel) {
 			if (ballHitPaddle(ball)) {
+				
+				ballHitSound();
+				
 				speed.toggleXDirection();
 				coord.setX(coord.getX() + paddleLevel
 						- (coord.getX() + ball.getGraphic().getWidth()));
@@ -410,6 +431,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				if (DEBUG && cacheMsg == null) {
 					setMessage("ballHitBrick()");
 				}
+				
+				ballHitSound();
 				
 
 				if (it.hasNext() == false) {
@@ -512,5 +535,21 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				openRetryDialog();
 			}
 		});
+	}
+	
+	private void ballHitSound() {
+		/*
+		this.activity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+			*/	
+				sp.play(1, 1.0f, 1.0f, 1, 0, 1.0f);
+				Log.d(TAG,"Played soundpool");
+				/*
+			}
+			
+		});
+		*/
 	}
 }

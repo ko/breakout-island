@@ -18,6 +18,14 @@ public class MainThread extends Thread {
 	/** main game panel */
 	private MainPanel panel;
 	
+	private final static int MAX_FPS = 40;
+	private final static int MAX_FRAME_SKIPS = 5;
+	private final static int FRAME_PERIOD = 1000 / MAX_FPS;
+	
+	final int STATE_INPROGRESS = 0;
+	final int STATE_EXIT = 1;
+	final int STATE_RETRY = 2;
+	
 	public MainThread(SurfaceHolder surfaceHolder, MainPanel panel) {
 		super();
 		this.surfaceHolder= surfaceHolder;  
@@ -38,17 +46,26 @@ public class MainThread extends Thread {
 	public void run() {
 		Canvas c = null;
 		long ticks = 0L;
+		long startTime;
+		long elapsedTime;
+		/** if < 0, we're too slow */
+		int sleepTime;
+		/** number of frame renderings skipped if we fall behind */
+		int framesSkipped;
+		
+		sleepTime = 0;
+		
 		Log.d(TAG, "Starting game loop");
 		while (running) {
 			try {
 				c = surfaceHolder.lockCanvas();
 				synchronized(surfaceHolder) {
+					
+					startTime = System.currentTimeMillis();
+					framesSkipped = 0;
+					
 					panel.updatePhysics();
 					panel.draw(c);
-					
-					final int STATE_INPROGRESS = 0;
-					final int STATE_EXIT = 1;
-					final int STATE_RETRY = 2;
 					
 					if (panel.getPauseStatus() == true) {
 						while (panel.getRunState() == STATE_INPROGRESS) {}
@@ -62,6 +79,24 @@ public class MainThread extends Thread {
 							break;
 						}
 					}
+					
+					elapsedTime = System.currentTimeMillis() - startTime;
+					sleepTime = (int)(FRAME_PERIOD - elapsedTime);
+					
+					if (sleepTime > 0) {
+						try {
+							/** we completed too fast; wait */
+							Thread.sleep(sleepTime);
+						} catch (InterruptedException e) {}
+					}
+					
+					while (elapsedTime < 0 && framesSkipped < MAX_FRAME_SKIPS) {
+						/** too slow; let's update only physics. don't render */
+						panel.updatePhysics();
+						elapsedTime += FRAME_PERIOD;
+						framesSkipped++;
+					}
+
 				}
 			} finally {
 				if (c != null) {

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.relurori.engine.graphics.Graphic;
 import com.relurori.engine.graphics.Graphic.Coordinates;
 import com.relurori.engine.graphics.Graphic.Speed;
+import com.relurori.engine.graphics.Scale;
 import com.relurori.engine.graphics.shapes.meta.Collision;
 import com.relurori.engine.graphics.shapes.meta.Intersection;
 import com.relurori.engine.io.Joystick;
@@ -63,10 +64,12 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private static float eventDownY = 0;
 	private static float paddleDownX = 0;
 
-	private float gameWindowWidth = 800;
+	private float gameWindowWidth;
 	
 	private Canvas canvas = null;
 	private String cacheMsg = null;
+	
+	private Scale scale;
 	
 	public MainPanel(Context context, Activity activity) {
 		super(context);
@@ -108,8 +111,12 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder arg0) {
 		thread.setRunning(true);
 		thread.start();
+
+		scale = new Scale(getWidth(),getHeight());
+		gameWindowWidth = scale.getScaledX(800);
 	}
 
+	
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		boolean retry = true;
@@ -229,8 +236,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.ball);
 		Ball ball = new Ball(launcher);
-		ball.getCoordinates().setX(500);
-		ball.getCoordinates().setY(500);
+		ball.getCoordinates().setX(scale.getScaledX(500));
+		ball.getCoordinates().setY(scale.getScaledY(500));
 		balls.add(ball);
 	}
 
@@ -246,15 +253,15 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		Brick brick = new Brick(launcher);
-		brick.getCoordinates().setX(100);
-		brick.getCoordinates().setY(150);
+		brick.getCoordinates().setX(scale.getScaledX(100));
+		brick.getCoordinates().setY(scale.getScaledY(150));
 		bricks.add(brick);
 		
 		launcher = BitmapFactory.decodeResource(getResources(),
 				R.drawable.brick);
 		brick = new Brick(launcher);
-		brick.getCoordinates().setX(600);
-		brick.getCoordinates().setY(300);
+		brick.getCoordinates().setX(scale.getScaledX(600));
+		brick.getCoordinates().setY(scale.getScaledY(300));
 		bricks.add(brick);
 	}
 	
@@ -268,9 +275,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		x = x - (bitmap.getWidth()/2);
 		y = y - (bitmap.getHeight()/2);
 		
-		joystick = new Joystick(bitmap, x, y);
-		joystick.getCoordinates().setX(x);
-		joystick.getCoordinates().setY(y);
+		joystick = new Joystick(bitmap, scale.getScaledX(x), scale.getScaledY(y));
+		joystick.getCoordinates().setX(scale.getScaledX(x));
+		joystick.getCoordinates().setY(scale.getScaledY(y));
 	}
 	
 	private void drawJoystick(Canvas canvas) {
@@ -433,7 +440,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				}
 				
 				ballHitSound();
-
 
 				if (it.hasNext() == false) {
 					Log.d(TAG,"victory");

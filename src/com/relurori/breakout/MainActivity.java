@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -44,20 +46,22 @@ public class MainActivity extends Activity {
 
 	private void onCreateSetupButton() {
 		
-		Button b = (Button) findViewById(R.id.singleplayer);
+		ImageButton b = (ImageButton) findViewById(R.id.singleplayer);
 		b.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 
 				Log.d(TAG, "Setting content view");
-				setContentView(new MainPanel(getApplicationContext(), MainActivity.this));
-
+				Intent i = new Intent(MainActivity.this, MainPanelActivity.class);
+				i.putExtra("genericKey", "value");
+				MainActivity.this.startActivity(i);
+				
 				Log.d(TAG, "Main game panel view added");	
 			}
 		});
 		
-		b = (Button) findViewById(R.id.multiplayer);
+		b = (ImageButton) findViewById(R.id.multiplayer);
 		b.setOnClickListener(new View.OnClickListener() {
 			
 			@Override

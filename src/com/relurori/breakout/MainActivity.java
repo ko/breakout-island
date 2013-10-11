@@ -11,8 +11,11 @@ import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -30,11 +33,39 @@ public class MainActivity extends Activity {
 		Log.d(TAG, "Setting full screen");
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		
 
-		Log.d(TAG, "Setting content view");
-		setContentView(new MainPanel(this, MainActivity.this));
+		setContentView(R.layout.activity_main);
+		
+		onCreateSetupButton();
+	}
 
-		Log.d(TAG, "Main game panel view added");		
+
+
+	private void onCreateSetupButton() {
+		
+		Button b = (Button) findViewById(R.id.singleplayer);
+		b.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+
+				Log.d(TAG, "Setting content view");
+				setContentView(new MainPanel(getApplicationContext(), MainActivity.this));
+
+				Log.d(TAG, "Main game panel view added");	
+			}
+		});
+		
+		b = (Button) findViewById(R.id.multiplayer);
+		b.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(getApplicationContext(),
+						"Multiplayer...yeah...", Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 
 

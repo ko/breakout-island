@@ -21,6 +21,8 @@ public class Joystick extends InputSystem {
 		super(bitmap);
 		restingX = x;
 		restingY = y;
+		this.getCoordinates().setX(x);
+		this.getCoordinates().setY(y);
 	}
 
 	public void setRestingX(float x) {

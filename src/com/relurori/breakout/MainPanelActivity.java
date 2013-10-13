@@ -18,18 +18,12 @@ public class MainPanelActivity extends Activity {
 
 	OrientationEventListener listener;
 	
-	boolean portrait = true;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		Intent i = getIntent();
 		String key = i.getStringExtra("genericKey");
-		
-		onCreateSetupListeners();
-		
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 		Log.d(TAG, "Requesting no title");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -38,27 +32,6 @@ public class MainPanelActivity extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		while (portrait) {
-			if (Configuration.ORIENTATION_LANDSCAPE == getResources()
-					.getConfiguration().orientation) {
-				Log.d(TAG, "now is landscape");
-				portrait = false;
-				setContentView(new MainPanel(getBaseContext(),
-						MainPanelActivity.this));
-			}
-		}
+		setContentView(new MainPanel(getBaseContext(), MainPanelActivity.this));
 	}
-
-	private void onCreateSetupListeners() {
-		listener = new OrientationEventListener(getBaseContext(),
-				SensorManager.SENSOR_DELAY_GAME) {
-			public void onOrientationChanged(int orientation) {
-				if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-					Log.d(TAG, "changed to landscape");
-				}
-			}
-		};
-		listener.enable();
-	}
-	
 }

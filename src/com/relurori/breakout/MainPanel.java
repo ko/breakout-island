@@ -276,8 +276,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		y = y - (bitmap.getHeight()/2);
 		
 		joystick = new Joystick(bitmap, scale.getScaledX(x), scale.getScaledY(y));
-		joystick.getCoordinates().setX(scale.getScaledX(x));
-		joystick.getCoordinates().setY(scale.getScaledY(y));
+		
+		Log.d(TAG,"gWW=" + gameWindowWidth + " gW=" + getWidth() + " x=" + x + " sX=" + scale.getScaledX(x));
 	}
 	
 	private void drawJoystick(Canvas canvas) {

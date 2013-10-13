@@ -462,13 +462,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				}
 				
 				ballHitSound();
-
-				if (it.hasNext() == false) {
+				it.remove();
+				
+				if (balls.isEmpty() == true) {
 					Log.d(TAG,"victory");
 					setMessage("victory()");
 					victory();
 				}
-				it.remove();
 				
 				s = ballHitFaceToggleDirection(s,i);
 			}

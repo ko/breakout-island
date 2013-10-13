@@ -284,7 +284,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		x = x - (bitmap.getWidth()/2);
 		y = y - (bitmap.getHeight()/2);
 		
-		joystick = new Joystick(bitmap, scale.getScaledX(x), scale.getScaledY(y));
+		joystick = new Joystick(bitmap, x, y);
 		
 		Log.d(TAG,"gWW=" + gameWindowWidth + " gW=" + getWidth() + " x=" + x + " sX=" + scale.getScaledX(x));
 	}

@@ -120,6 +120,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		boolean retry = true;
+		Log.d(TAG,"Surface destroyed");
 		while (retry) {
 			try {
 				thread.join();

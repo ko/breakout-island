@@ -59,6 +59,12 @@ public class MainThread extends Thread {
 		while (running) {
 			try {
 				c = surfaceHolder.lockCanvas();
+				
+				if (c == null) {
+					Log.d(TAG,"Breaking run loop");
+					break;
+				}
+				
 				synchronized(surfaceHolder) {
 					
 					startTime = System.currentTimeMillis();

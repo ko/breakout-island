@@ -34,4 +34,22 @@ public class MainPanelActivity extends Activity {
 
 		setContentView(new MainPanel(getBaseContext(), MainPanelActivity.this));
 	}
+
+	@Override
+	protected void onDestroy() {
+		Log.d(TAG, "Destroy");
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onStop() {
+		Log.d(TAG, "Stop");
+		super.onStop();
+	}
+
+	@Override
+	protected void onPause() {
+		Log.d(TAG, "Pause");
+		super.onPause();
+	}
 }

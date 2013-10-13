@@ -1,4 +1,4 @@
-package com.relurori.breakout;
+package com.relurori.engine.graphics.premade;
 
 import com.relurori.engine.graphics.shapes.Rectangle;
 import com.relurori.engine.graphics.shapes.meta.Collision;

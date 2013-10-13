@@ -1,6 +1,6 @@
 package com.relurori.engine.graphics.shapes.generic;
 
-import com.relurori.engine.graphics.Graphic;
+import com.relurori.engine.graphics.generic.Graphic;
 
 import android.graphics.Bitmap;
 

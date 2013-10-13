@@ -1,7 +1,7 @@
 package com.relurori.engine.graphics.shapes.meta;
 
 
-import com.relurori.engine.graphics.Graphic;
+import com.relurori.engine.graphics.generic.Graphic;
 
 import android.graphics.Bitmap;
 

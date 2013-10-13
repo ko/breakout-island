@@ -3,10 +3,13 @@ package com.relurori.breakout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.relurori.engine.graphics.Graphic;
-import com.relurori.engine.graphics.Graphic.Coordinates;
-import com.relurori.engine.graphics.Graphic.Speed;
-import com.relurori.engine.graphics.Scale;
+import com.relurori.engine.graphics.generic.Graphic;
+import com.relurori.engine.graphics.generic.Graphic.Coordinates;
+import com.relurori.engine.graphics.generic.Graphic.Speed;
+import com.relurori.engine.graphics.meta.Scale;
+import com.relurori.engine.graphics.premade.Ball;
+import com.relurori.engine.graphics.premade.Brick;
+import com.relurori.engine.graphics.premade.Paddle;
 import com.relurori.engine.graphics.shapes.meta.Collision;
 import com.relurori.engine.graphics.shapes.meta.Intersection;
 import com.relurori.engine.io.Joystick;

@@ -1,4 +1,4 @@
-package com.relurori.engine.graphics;
+package com.relurori.engine.graphics.generic;
 
 import java.util.ArrayList;
 

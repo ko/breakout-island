@@ -1,4 +1,4 @@
-package com.relurori.engine.graphics;
+package com.relurori.engine.graphics.meta;
 
 import android.util.Log;
 

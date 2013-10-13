@@ -233,12 +233,21 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	private void addFirstBalls() {
-		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-				R.drawable.ball);
-		Ball ball = new Ball(launcher);
-		ball.getCoordinates().setX(scale.getScaledX(500));
-		ball.getCoordinates().setY(scale.getScaledY(500));
-		balls.add(ball);
+		if (balls.isEmpty()) {
+			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+					R.drawable.ball);
+			Ball ball = new Ball(launcher);
+			ball.getCoordinates().setX(scale.getScaledX(500));
+			ball.getCoordinates().setY(scale.getScaledY(500));
+			balls.add(ball);
+		} else {
+			for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
+				Ball ball = it.next();
+				ball.setVisible(true);
+				ball.getCoordinates().setX(scale.getScaledX(500));
+				ball.getCoordinates().setY(scale.getScaledY(500));
+			}
+		}
 	}
 
 	private void addFirstPaddle() {
@@ -329,18 +338,31 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void drawBall(Canvas canvas) {
+		boolean addFirst = false;
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
 
 		if (balls.isEmpty()) {
+			addFirst = true;
+		}
+		
+		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
+			Ball ball = it.next();
+			if (ball.getVisible() == false)
+				addFirst = true;
+		}
+		
+		if (addFirst == true) {
 			addFirstBalls();
 		}
 
 		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
 			Ball ball = it.next();
-			bitmap = ball.getGraphic();
-			coords = ball.getCoordinates();
-			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
+			if (ball.getVisible()) {
+				bitmap = ball.getGraphic();
+				coords = ball.getCoordinates();
+				canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
+			}
 		}
 
 	}
@@ -403,7 +425,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				coord.setX(coord.getX() + paddleLevel
 						- (coord.getX() + ball.getGraphic().getWidth()));
 			} else {
-				balls.remove(ball);
+				ball.setVisible(false);
 			}
 		}
 

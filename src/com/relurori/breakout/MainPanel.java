@@ -151,6 +151,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				if (joystick.getRestingState() == false) {
 					joystick.getCoordinates().setX(joystick.getCoordinates().getX() + deltaX);
 					joystick.getCoordinates().setY(joystick.getRestingY() + deltaY);
+					
+					/* TODO add movement range limit here */
 				}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				joystick.setToRestingState();

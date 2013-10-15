@@ -16,6 +16,8 @@ public class Joystick extends InputSystem {
 	private float restingY;
 	
 	private boolean resting = true;
+
+	private int movementPercentage = 25;
 	
 	public Joystick(Bitmap bitmap, float x, float y) {
 		super(bitmap);
@@ -24,7 +26,24 @@ public class Joystick extends InputSystem {
 		this.getCoordinates().setX(x);
 		this.getCoordinates().setY(y);
 	}
+	
+	public Joystick(Bitmap bitmap, float x, float y, int mvmtPercentage) {
+		super(bitmap);
+		restingX = x;
+		restingY = y;
+		this.getCoordinates().setX(x);
+		this.getCoordinates().setY(y);
+		movementPercentage = mvmtPercentage;
+	}
 
+	public int getMovementRange() {
+		return movementPercentage;
+	}
+
+	public float getMovementRangePercent() {
+		return 0.01f * movementPercentage;
+	}
+	
 	public void setRestingX(float x) {
 		restingX = x;
 	}

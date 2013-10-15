@@ -11,11 +11,8 @@ public class Paddle extends Rectangle {
 
 	private static final String TAG = Paddle.class.getSimpleName();
 	
-	private int movementPercentage = 100;
-	
 	public Paddle(Bitmap bitmap, int maxY, int mvmtPercentage) {
 		super(bitmap, 0, maxY);
-		movementPercentage = mvmtPercentage;
 	}
 	
 	public Paddle(Bitmap bitmap, int maxY) {
@@ -37,13 +34,5 @@ public class Paddle extends Rectangle {
 
 	public boolean ballHit(Ball ball) {
 		return Collision.between(ball,this).getIntersect();
-	}
-
-	public int getTotalMovementRange() {
-		return movementPercentage;
-	}
-	
-	public int getHalfMovementRange() {
-		return movementPercentage/2;
 	}
 }

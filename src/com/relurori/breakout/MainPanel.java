@@ -145,14 +145,18 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 					joystick.setRestingState(false);
 				}
 			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-				float deltaX = event.getX() - eventDownX;
 				float deltaY = event.getY() - eventDownY;
 				
 				if (joystick.getRestingState() == false) {
-					joystick.getCoordinates().setX(joystick.getCoordinates().getX() + deltaX);
+					float movementRange = joystick.getMovementRangePercent()*scale.getHeight();
+					movementRange = scale.getScaledY(movementRange);
+					if (deltaY > movementRange) {
+						deltaY = movementRange;
+					} else if (deltaY < (-1)*movementRange) {
+						deltaY = (-1)*movementRange;
+					}
+					joystick.getCoordinates().setX(joystick.getRestingX());
 					joystick.getCoordinates().setY(joystick.getRestingY() + deltaY);
-					
-					/* TODO add movement range limit here */
 				}
 			} else if (event.getAction() == MotionEvent.ACTION_UP) {
 				joystick.setToRestingState();
@@ -290,9 +294,22 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		x = x - (bitmap.getWidth()/2);
 		y = y - (bitmap.getHeight()/2);
 		
-		joystick = new Joystick(bitmap, x, y);
+		joystick = new Joystick(bitmap, x, y, 25);
 		
 		Log.d(TAG,"gWW=" + gameWindowWidth + " gW=" + getWidth() + " x=" + x + " sX=" + scale.getScaledX(x));
+	}	
+	
+	private void addFirstJoystickBg(Canvas canvas) {
+		float x = (getWidth() + gameWindowWidth) / 2;
+		float y = (getHeight()/2);
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+				R.drawable.jstick_bg);
+
+		x = x - (bitmap.getWidth()/2);
+		y = y - (bitmap.getHeight()/2);
+	
+		canvas.drawBitmap(bitmap, x, y, null);
+
 	}
 	
 	private void drawJoystick(Canvas canvas) {
@@ -300,16 +317,19 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		if (joystick == null) {
 			addFirstJoystick();
 		}
+		addFirstJoystickBg(canvas);
+		
 		Bitmap bitmap = joystick.getGraphic();
 		float x = joystick.getCoordinates().getX();
 		float y = joystick.getCoordinates().getY();
 		
 		canvas.drawBitmap(bitmap, x, y, null);
+
 		
 		if (joystick.getDirection() != Joystick.MOVEMENT_STOP)
 			Log.d(TAG,"joystick=" + joystick.toString());
 	}
-	
+
 	private void drawBricks(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;

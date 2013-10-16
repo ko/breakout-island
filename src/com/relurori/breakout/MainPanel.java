@@ -13,6 +13,7 @@ import com.relurori.engine.graphics.premade.Paddle;
 import com.relurori.engine.graphics.shapes.meta.Collision;
 import com.relurori.engine.graphics.shapes.meta.Intersection;
 import com.relurori.engine.io.Joystick;
+import com.relurori.engine.main.MainThread;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,4 +1,6 @@
-package com.relurori.breakout;
+package com.relurori.engine.main;
+
+import com.relurori.breakout.MainPanel;
 
 import android.app.AlertDialog;
 import android.graphics.Canvas;

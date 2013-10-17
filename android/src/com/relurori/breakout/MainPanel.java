@@ -51,7 +51,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private ArrayList<Brick> bricks = new ArrayList<Brick>();
 	private Graphic currentGraphic = null;
-	private Paddle paddle = null;
+	private ArrayList<Paddle> paddles = new ArrayList<Paddle>();
 	private Joystick joystick = null;
 	
 	private PhysicsCache physicsCache = null; 
@@ -179,7 +179,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		canvas.drawColor(Color.BLACK);
 
 		drawBall(canvas);
-		drawPaddle(canvas);
+		drawPaddles(canvas);
 		drawBricks(canvas);
 		drawJoystick(canvas);
 		
@@ -197,8 +197,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		for (Brick brick : bricks) {
 			canvas.drawCircle(brick.getCoordinates().getX(), brick.getCoordinates().getY(), 10, paint);
 		}
-		canvas.drawCircle(paddle.getCoordinates().getX(), paddle.getCoordinates().getY(), 10, paint);
-
+		for (Paddle paddle : paddles) {
+			canvas.drawCircle(paddle.getCoordinates().getX(), paddle.getCoordinates().getY(), 10, paint);
+		}
+		
 		int yoff = 20;
 		paint = new Paint();
 		paint.setTextSize(yoff);
@@ -245,7 +247,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void resetLevel() {
 		bricks.clear();
 		addFirstBricks();
-		addFirstPaddle();
+		addFirstPaddles();
 		balls.clear();
 		addFirstBalls();
 	}
@@ -268,11 +270,25 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	private void addFirstPaddle() {
-		Bitmap launcher = BitmapFactory.decodeResource(getResources(),
-				R.drawable.paddle);
-		paddle = new Paddle(launcher);
-		paddle.getCoordinates().setX(gameWindowWidth - launcher.getWidth());
+	private void addFirstPaddles() {
+		if (paddles.isEmpty()) {
+			Bitmap launcher = BitmapFactory.decodeResource(getResources(),
+					R.drawable.paddle);
+			Paddle paddle = new Paddle(launcher);
+			paddle.getCoordinates().setX(gameWindowWidth - launcher.getWidth());
+			paddles.add(paddle);
+			
+			launcher = BitmapFactory.decodeResource(getResources(),
+					R.drawable.paddle);
+			paddle = new Paddle(launcher);
+			paddle.getCoordinates().setX(0);
+			paddles.add(paddle);
+		} else {
+			for (Iterator<Paddle> it = paddles.iterator(); it.hasNext(); ) {
+				Paddle paddle = it.next();
+				paddle.getCoordinates().setY(getHeight() - paddle.getHeight());
+			}
+		}
 	}
 
 	private void addFirstBricks() {
@@ -356,19 +372,22 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	private void drawPaddle(Canvas canvas) {
+	private void drawPaddles(Canvas canvas) {
 		Bitmap bitmap;
 		Graphic.Coordinates coords;
 		float xLeft;
-
-		/* getHeight() returns 0 in onCreate() */
-		if (paddle == null) {
-			addFirstPaddle();
+		
+		if (paddles.isEmpty()) {
+			addFirstPaddles();
 		}
-
-		bitmap = paddle.getGraphic();
-		coords = paddle.getCoordinates();
-		canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
+		
+		for (Iterator<Paddle> it = paddles.iterator(); it.hasNext(); ) {
+			Paddle paddle = it.next();
+			/* getHeight() returns 0 in onCreate() */
+			bitmap = paddle.getGraphic();
+			coords = paddle.getCoordinates();
+			canvas.drawBitmap(bitmap, coords.getX(), coords.getY(), null);
+		}
 	}
 
 	private void drawBall(Canvas canvas) {
@@ -402,9 +421,9 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void updatePhysics() {
-		
-		updatePhysicsCacheLocal();
+
 		updatePhysicsCacheRemote();
+		updatePhysicsCacheLocal();
 	}
 
 	private void updatePhysicsCacheRemote() {
@@ -421,10 +440,17 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void updatePhysicsCacheLocal() {
 		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
 			Ball ball = it.next();
-			updateBallPhysics(ball);
+			for (Iterator<Paddle> it2 = paddles.iterator(); it2.hasNext(); ) {
+				Paddle paddle = it2.next();
+				
+				updateBallPhysics(paddle, ball);
+			}
 		}
-		if (paddle != null)
-			updatePaddlePhysics();
+		for (Iterator<Paddle> it = paddles.iterator(); it.hasNext(); ) {
+			Paddle paddle = it.next();
+			if (paddle != null)
+				updatePaddlePhysics(paddle);
+		}
 		if (joystick != null) 
 			updateJoystickPhysics();
 	}
@@ -433,7 +459,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		joystick.getCoordinates().setX(joystick.getRestingX());
 	}
 
-	private void updatePaddlePhysics() {
+	private void updatePaddlePhysics(Paddle paddle) {
 		Graphic.Coordinates coord = paddle.getCoordinates();
 		float deltaY = paddle.getCoordinates().getY();
 		
@@ -451,11 +477,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			paddle.getCoordinates().setY(getHeight() - paddle.getHeight());
 	}
 
-	private void updateBallPhysics(Ball ball) {
+	private void updateBallPhysics(Paddle paddle, Ball ball) {
 		Graphic.Coordinates coord = ball.getCoordinates();
 		Graphic.Speed speed = ball.getSpeed();
 
-		float paddleLevel = gameWindowWidth - paddle.getGraphic().getWidth();
+		float paddleLevel = paddle.getCoordinates().getX();
 
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
@@ -468,7 +494,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			speed.toggleXDirection();
 			coord.setX(-coord.getX());
 		} else if (coord.getX() + ball.getGraphic().getWidth() > paddleLevel) {
-			if (ballHitPaddle(ball)) {
+			if (ballHitPaddle(paddle, ball)) {
 				
 				ballHitSound();
 				
@@ -573,7 +599,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		return coord;
 	}
 
-	private boolean ballHitPaddle(Ball ball) {
+	private boolean ballHitPaddle(Paddle paddle, Ball ball) {
 		boolean hit = paddle.ballHit(ball);
 		return hit;
 	}

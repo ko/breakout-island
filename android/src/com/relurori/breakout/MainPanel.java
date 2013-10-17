@@ -54,6 +54,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private Paddle paddle = null;
 	private Joystick joystick = null;
 	
+	private PhysicsCache physicsCache = null; 
+	
 	private SoundPool sp = null;
 
 	private int STATE_INPROGRESS = 0;
@@ -87,6 +89,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		this.context = context;
 		this.activity = activity;
 		
+		physicsCache = new PhysicsCache();
+		setupSoundPool();
+	}
+
+	private void setupSoundPool() {
 		sp = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
 		int sid = sp.load(getContext(), R.raw.hit, 1);
 		boolean loaded = false;
@@ -395,6 +402,23 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void updatePhysics() {
+		
+		updatePhysicsCacheLocal();
+		updatePhysicsCacheRemote();
+	}
+
+	private void updatePhysicsCacheRemote() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * updatePhysicsCache
+	 * 
+	 * Shim layer which will update the cached objects' physics 
+	 * based on single or multiplayer status.
+	 */
+	private void updatePhysicsCacheLocal() {
 		for (Iterator<Ball> it = balls.iterator(); it.hasNext(); ) {
 			Ball ball = it.next();
 			updateBallPhysics(ball);

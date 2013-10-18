@@ -434,11 +434,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	private void updatePhysicsCacheLocal() {
 		for (int i = 0; i < balls.size(); i++) {
-			int j = 1;
-			//for (int j = 0; j < paddles.size(); j++) {
-			if (balls.get(i).getVisible() == true)
-				updateBallPhysics(paddles.get(j), balls.get(i));
-			//}
+				updateBallPhysics(balls.get(i));
 		}
 		for (int i = 0; i < paddles.size(); i++) {
 			updatePaddlePhysics(paddles.get(i));
@@ -469,43 +465,23 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			paddle.getCoordinates().setY(getHeight() - paddle.getHeight());
 	}
 
-	private void updateBallPhysics(Paddle paddle, Ball ball) {
+	private void updateBallPhysics(Ball ball) {
 		Graphic.Coordinates coord = ball.getCoordinates();
 		Graphic.Speed speed = ball.getSpeed();
-
-		float paddleLevel = paddle.getCoordinates().getX();
 
 		// Direction
 		coord = updateBallPhysicsDirections(coord, speed);
 
 		// Brick hit
 		speed = ballHitBricks(ball, speed);
-
+		
 		// borders for x...
 		if (coord.getX() < 0) {
-			if (ballHitPaddle(paddle, ball)) {
-				
-				ballHitSound();
-				
-				speed.toggleXDirection();
-				coord.setX(coord.getX() + paddleLevel
-						- (coord.getX() + ball.getGraphic().getWidth()));
-			} else {
-				ball.setVisible(false);
-			}
-		} else if (coord.getX() + ball.getGraphic().getWidth() > paddleLevel) {
-			if (ballHitPaddle(paddle, ball)) {
-				
-				ballHitSound();
-				
-				speed.toggleXDirection();
-				coord.setX(coord.getX() + paddleLevel
-						- (coord.getX() + ball.getGraphic().getWidth()));
-			} else {
-				ball.setVisible(false);
-			}
+			ball.setVisible(false);
+		} else if (coord.getX() + ball.getGraphic().getWidth() > gameWindowWidth) {
+			ball.setVisible(false);
 		}
-
+		
 		// borders for y...
 		/* If we're below paddle height. We'll lose anyways. */
 		if (coord.getY() < 0) {
@@ -515,6 +491,40 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			speed.toggleYDirection();
 			coord.setY(coord.getY() + getHeight()
 					- (coord.getY() + ball.getGraphic().getHeight()));
+		}
+		
+		updateBallPaddlesPhysics(ball);
+		
+	}
+
+	private void updateBallPaddlesPhysics(Ball ball) {
+		float paddleLevel;
+		
+		for (int i = 0; i < paddles.size(); i++) {
+			paddleLevel = paddles.get(i).getCoordinates().getX();
+
+			if (paddleLevel == 0) {
+				if (ball.getCoordinates().getX() < paddles.get(i).getWidth()) {
+					if (ballHitPaddle(paddles.get(i), ball)) {
+
+						ballHitSound();
+
+						ball.getSpeed().toggleXDirection();
+						ball.getCoordinates().setX(paddleLevel + ball.getCoordinates().getX());
+					}
+				}
+			} else {
+				// So this isn't scalable at all.
+				if (ball.getCoordinates().getX() + ball.getGraphic().getWidth() > paddleLevel) {
+					if (ballHitPaddle(paddles.get(i), ball)) {
+
+						ballHitSound();
+
+						ball.getSpeed().toggleXDirection();
+						ball.getCoordinates().setX(paddleLevel - ball.getGraphic().getWidth());
+					}
+				}
+			}
 		}
 	}
 

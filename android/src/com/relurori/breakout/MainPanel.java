@@ -251,6 +251,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		addFirstPaddles();
 		balls.clear();
 		addFirstBalls();
+		STATE_RUN = STATE_INPROGRESS;
 	}
 	
 	private void addFirstBalls() {
@@ -478,8 +479,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		// borders for x...
 		if (coord.getX() < 0) {
 			ball.setVisible(false);
+			failure();
 		} else if (coord.getX() + ball.getGraphic().getWidth() > gameWindowWidth) {
 			ball.setVisible(false);
+			failure();
 		}
 		
 		// borders for y...
@@ -550,7 +553,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				ballHitSound();
 				bricks.remove(j);
 				
-				if (balls.isEmpty() == true) {
+				if (bricks.isEmpty() == true) {
 					Log.d(TAG,"victory");
 					setMessage("victory()");
 					victory();
@@ -613,7 +616,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void openRetryDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
 
 		Log.d(TAG,"Building dialog");
 		
@@ -644,6 +647,18 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void victory() {
+		
+		STATE_PAUSE = true;
+		
+		this.activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				openRetryDialog();
+			}
+		});
+	}
+
+	private void failure() {
 		
 		STATE_PAUSE = true;
 		

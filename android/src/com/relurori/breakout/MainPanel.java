@@ -39,6 +39,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private static final String TAG = MainPanel.class.getSimpleName();
 
+	private boolean DEBUG = false;
+	
 	private MainThread thread;
 
 	/*
@@ -63,7 +65,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private int STATE_RETRY = 2;
 	private int STATE_RUN = STATE_INPROGRESS;
 	private boolean STATE_PAUSE = false;
-	private boolean DEBUG = true;
 	/** affects the victory condition */
 
 	private static float eventDownX = 0;
@@ -508,6 +509,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 			if (paddleLevel == 0) {
 				if (ball.getCoordinates().getX() < paddles.get(i).getWidth()) {
+					Log.d(TAG,"Paddle1?");
 					if (ballHitPaddle(paddles.get(i), ball)) {
 
 						ballHitSound();
@@ -519,6 +521,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			} else {
 				// So this isn't scalable at all.
 				if (ball.getCoordinates().getX() + ball.getGraphic().getWidth() > paddleLevel) {
+					Log.d(TAG,"Paddle0?");
 					if (ballHitPaddle(paddles.get(i), ball)) {
 
 						ballHitSound();
@@ -642,8 +645,10 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 						STATE_RUN = STATE_EXIT;
 						STATE_PAUSE = true;
 					}
-				}).show();
-
+				});
+		Log.d(TAG,"Showing dialog");
+		builder.show();
+		Log.d(TAG,"Done with dialog");
 	}
 
 	private void victory() {
@@ -660,12 +665,12 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private void failure() {
 		
-		STATE_PAUSE = true;
+		//STATE_PAUSE = true;
 		
 		this.activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				openRetryDialog();
+				//openRetryDialog();
 			}
 		});
 	}

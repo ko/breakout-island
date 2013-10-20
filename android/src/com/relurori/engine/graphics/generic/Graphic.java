@@ -186,23 +186,30 @@ public class Graphic {
 	 */
     public class Meta {
     	
-
-        private ArrayList<float[]> corners = null;
+    	private ArrayList<ArrayList<Float>> corners = null;
+    	private ArrayList<Float> cornerNW = null;
+    	private ArrayList<Float> cornerNE = null;
+    	private ArrayList<Float> cornerSE = null;
+    	private ArrayList<Float> cornerSW = null;
     	private ArrayList<Slope> slopes = null;
 
     	public Meta() {
     		slopes = new ArrayList<Slope>();
-    		corners = new ArrayList<float[]>();
+    		corners = new ArrayList<ArrayList<Float>>();
+    		cornerNW = new ArrayList<Float>();
+    		cornerNE = new ArrayList<Float>();
+    		cornerSE = new ArrayList<Float>();
+    		cornerSW = new ArrayList<Float>();
     	}
     	
-    	public ArrayList<float[]> getCorners() {
+    	public ArrayList<ArrayList<Float>> getCorners() {
 	    	if (corners.isEmpty()) {
 	    		updateCorners();
 	    	}
 	    	return corners;
     	}
     	
-    	public ArrayList<float[]> getCorners(boolean cached) {
+    	public ArrayList<ArrayList<Float>> getCorners(boolean cached) {
     		if (corners.isEmpty() || cached == false) {
     			updateCorners();
     		}
@@ -214,29 +221,65 @@ public class Graphic {
          * 			at the top-left and clockwise thereafter.
          */
         private void updateCorners() {
-        	corners.clear();
-        	corners.add(Corner.NW, Corner.getCornerNW(bitmap,getCoordinates()));
-        	corners.add(Corner.NE, Corner.getCornerNE(bitmap,getCoordinates()));
-        	corners.add(Corner.SE, Corner.getCornerSE(bitmap,getCoordinates()));
-        	corners.add(Corner.SW, Corner.getCornerSW(bitmap,getCoordinates()));
-        }
-        
-    	public ArrayList<Slope> getSlopes() {
-    		
-    		if (slopes.isEmpty()) {
+        	synchronized(corners) {
+        		updateNWCorner();
+        		updateNECorner();
+        		updateSECorner();
+        		updateSWCorner();
+	
+				if (corners.isEmpty()) {
+					corners.add(Corner.NW, cornerNW);
+					corners.add(Corner.NE, cornerNE);
+					corners.add(Corner.SE, cornerSE);
+					corners.add(Corner.SW, cornerSW);
 
-    			float[] theNW = getMeta().getCorners().get(Corner.NW);
-    			float[] theSW = getMeta().getCorners().get(Corner.SW);
-    			float[] theNE = getMeta().getCorners().get(Corner.NE);
-    			float[] theSE = getMeta().getCorners().get(Corner.SE);
-    	    	
-    			slopes.add(Slope.NORTH,	new Slope(theNW,theNE));
-    			slopes.add(Slope.EAST, 	new Slope(theNE,theSE));
-    			slopes.add(Slope.SOUTH,	new Slope(theSW,theSE));
-    			slopes.add(Slope.WEST, 	new Slope(theNW,theSW));
-    		}
-    		
-    		return slopes;
-    	}
+				} else {
+					corners.set(Corner.NW, cornerNW);
+					corners.set(Corner.NE, cornerNE);
+					corners.set(Corner.SE, cornerSE);
+					corners.set(Corner.SW, cornerSW);
+				}
+			}
+        }
+
+		private void updateSWCorner() {
+			if (cornerSW.isEmpty()) {
+				cornerSW.add(Corner.X, Corner.getSW.X(bitmap, getCoordinates()));
+				cornerSW.add(Corner.Y, Corner.getSW.Y(bitmap, getCoordinates()));
+			} else {
+				cornerSW.set(Corner.X, Corner.getSW.X(bitmap, getCoordinates()));
+				cornerSW.set(Corner.Y, Corner.getSW.Y(bitmap, getCoordinates()));
+			}
+		}
+
+		private void updateSECorner() {
+			if (cornerSE.isEmpty()) {
+				cornerSE.add(Corner.X, Corner.getSE.X(bitmap, getCoordinates()));
+				cornerSE.add(Corner.Y, Corner.getSE.Y(bitmap, getCoordinates()));
+			} else {
+				cornerSE.set(Corner.X, Corner.getSE.X(bitmap, getCoordinates()));
+				cornerSE.set(Corner.Y, Corner.getSE.Y(bitmap, getCoordinates()));
+			}
+		}
+
+		private void updateNECorner() {
+			if (cornerNE.isEmpty()) {
+				cornerNE.add(Corner.X, Corner.getNE.X(bitmap, getCoordinates()));
+				cornerNE.add(Corner.Y, Corner.getNE.Y(bitmap, getCoordinates()));
+			} else {
+				cornerNE.set(Corner.X, Corner.getNE.X(bitmap, getCoordinates()));
+				cornerNE.set(Corner.Y, Corner.getNE.Y(bitmap, getCoordinates()));
+			}
+		}
+
+		private void updateNWCorner() {
+			if (cornerNW.isEmpty()) {
+				cornerNW.add(Corner.X, Corner.getNW.X(bitmap, getCoordinates()));
+				cornerNW.add(Corner.Y, Corner.getNW.Y(bitmap, getCoordinates()));
+			} else {
+				cornerNW.set(Corner.X, Corner.getNW.X(bitmap, getCoordinates()));
+				cornerNW.set(Corner.Y, Corner.getNW.Y(bitmap, getCoordinates()));
+			}
+		}
     }
 }

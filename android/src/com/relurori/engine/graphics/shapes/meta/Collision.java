@@ -21,7 +21,7 @@ public class Collision {
 	public static final int SW_CORNER = 7;
 	public static final int NW_CORNER = 8;
 	
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	public static Intersection between(Circle circle, Rectangle rect) {
 		Intersection intersection = new Intersection();
@@ -30,48 +30,43 @@ public class Collision {
 		float cy = circle.getCenter().getY();
 		float cr = circle.getRadius();
 		
-		ArrayList<float[]> corners = rect.getMeta().getCorners(false);
+		ArrayList<ArrayList<Float>> corners = rect.getMeta().getCorners(false);
 		
-		float[] rnw = corners.get(Corner.NW);
-		float[] rne = corners.get(Corner.NE);
-		float[] rsw = corners.get(Corner.SW);
-		
-		float rnwx = rnw[0];
-		float rnwy = rnw[1];
-		float rnex = rne[0];
-		float rswy = rsw[1];
+		ArrayList<Float> rnw = corners.get(Corner.NW);
+		ArrayList<Float> rne = corners.get(Corner.NE);
+		ArrayList<Float> rsw = corners.get(Corner.SW);
 		
 		if (DEBUG) {
 			Log.d(TAG,"cx,cy,cr=" + "(" + cx + "," + cy + "," + cr + ")");
-			Log.d(TAG,"rnwx,rnwy=(" + rnwx + "," + rnwy + ")");
+			Log.d(TAG,"rnwx,rnwy=(" + rnw.get(Corner.X) + "," + rnw.get(Corner.Y) + ")");
 			DEBUG=false;
 		}
 		
-		if (rnwx <= cx && cx <= rnex) {
-			if (Math.abs(rnwy - cy) <= cr) {
+		if (rnw.get(Corner.X) <= cx && cx <= rne.get(Corner.X)) {
+			if (Math.abs(rnw.get(Corner.Y) - cy) <= cr) {
 				// above
-				Log.d(TAG,"Hit:1");
+				Log.d(TAG,"Hit:X1");
 				intersection.setIntersect(true);
 				intersection.setFace(Collision.NORTH_FACE);
 			}
-			if (Math.abs(rswy - cy) <= cr) {
+			if (Math.abs(rsw.get(Corner.Y) - cy) <= cr) {
 				// below
-				Log.d(TAG,"Hit:2");
+				Log.d(TAG,"Hit:X2");
 				intersection.setIntersect(true);
 				intersection.setFace(Collision.SOUTH_FACE);
 			}
 		}
 		
-		if (rnwy <= cy && cy <= rswy) {
-			if (Math.abs(rnwx - cx) <= cr) {
+		if (rnw.get(Corner.Y) <= cy && cy <= rsw.get(Corner.Y)) {
+			if (Math.abs(rnw.get(Corner.X) - cx) <= cr) {
 				// left
-				Log.d(TAG,"Hit:3");
+				Log.d(TAG,"Hit:Y1");
 				intersection.setIntersect(true);
 				intersection.setFace(Collision.WEST_FACE);
 			}
-			if (Math.abs(rnex - cx) <= cr) {
+			if (Math.abs(rne.get(Corner.X) - cx) <= cr) {
 				// right
-				Log.d(TAG,"Hit:4");
+				Log.d(TAG,"Hit:Y2");
 				intersection.setIntersect(true);
 				intersection.setFace(Collision.EAST_FACE);
 			}

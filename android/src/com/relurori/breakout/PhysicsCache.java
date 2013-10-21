@@ -1,5 +1,6 @@
 package com.relurori.breakout;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import com.relurori.engine.graphics.generic.Graphic;
@@ -27,5 +28,9 @@ public class PhysicsCache {
 	
 	public ArrayList<Long> getMsCtimes() {
 		return msCtimes;
+	}
+
+	public void update(InputStream content) {
+		
 	}
 }

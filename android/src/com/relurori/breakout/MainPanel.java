@@ -1,7 +1,14 @@
 package com.relurori.breakout;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.relurori.engine.graphics.generic.Graphic;
 import com.relurori.engine.graphics.generic.Graphic.Coordinates;
@@ -14,6 +21,7 @@ import com.relurori.engine.graphics.shapes.meta.Collision;
 import com.relurori.engine.graphics.shapes.meta.Intersection;
 import com.relurori.engine.io.Joystick;
 import com.relurori.engine.main.MainThread;
+import com.relurori.engine.network.NetworkThread;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,7 +49,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	private boolean DEBUG = false;
 	
-	private MainThread thread;
+	private MainThread mainThread;
+	private MultiplayerNetworkThread networkThread;
 
 	/*
 	 * TODO does it make sense to hold a reference to the calling Context and
@@ -56,7 +65,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private ArrayList<Paddle> paddles = new ArrayList<Paddle>();
 	private Joystick joystick = null;
 	
-	private PhysicsCache physicsCache = new PhysicsCache(); 
+	private PhysicsCache physicsCache = null; 
 	
 	private SoundPool sp = null;
 
@@ -82,8 +91,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		getHolder().addCallback(this);
 
+		physicsCache = new PhysicsCache(); 
+		
 		// instantiate game loop thread
-		thread = new MainThread(getHolder(), this);
+		mainThread = new MainThread(getHolder(), this);
+		networkThread = new MultiplayerNetworkThread(physicsCache);
 
 		setFocusable(true);
 
@@ -120,8 +132,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
-		thread.setRunning(true);
-		thread.start();
+		networkThread.setRunning(true);
+		networkThread.start();
+		
+		mainThread.setRunning(true);
+		mainThread.start();
 
 		scale = new Scale(getWidth(),getHeight());
 		gameWindowWidth = scale.getScaledX(800);
@@ -134,7 +149,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		Log.d(TAG,"Surface destroyed");
 		while (retry) {
 			try {
-				thread.join();
+				mainThread.join();
+				networkThread.join();
 				retry = false;
 			} catch (InterruptedException e) {
 				// try again
@@ -144,7 +160,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		synchronized (thread.getSurfaceHolder()) {
+		synchronized (mainThread.getSurfaceHolder()) {
 			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 				eventDownX = event.getX();
 				eventDownY = event.getY();
@@ -419,13 +435,49 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void updatePhysics() {
 
-		updatePhysicsCacheRemote();
+		updatePhysicsCacheAdhocRemote();
 		updatePhysicsCacheLocal();
+		updatePhysicsGlobal();
 	}
 
-	private void updatePhysicsCacheRemote() {
-		// TODO Auto-generated method stub
+	private void updatePhysicsGlobal() {
+		for (int i = 0; i < balls.size(); i++) {
+			updateBallPhysics(balls.get(i));
+		}
+	}
+
+	private void updatePhysicsCacheAdhocRemote() {
+		updateAdhocRemotePaddlePhysics();
+	}
+
+	private void updateAdhocRemotePaddlePhysics() {
+		HttpResponse res;
+		DefaultHttpClient client;
+		HttpGet get;
+		String url;
 		
+		url = "http://yaksok.net";
+		res = null;
+		client = new DefaultHttpClient();
+		get = new HttpGet(URI.create(url));
+		try {
+			res = client.execute(get);
+			switch (res.getStatusLine().getStatusCode()) {
+			case 401:
+				Log.d(TAG,"http: 401");
+				break;
+			case 200:
+				Log.d(TAG,"http: 200");
+				physicsCache.update(res.getEntity().getContent());
+				break;
+			default:
+				Log.d(TAG,"http: default");
+			}
+		}  catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -435,9 +487,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	 * based on single or multiplayer status.
 	 */
 	private void updatePhysicsCacheLocal() {
-		for (int i = 0; i < balls.size(); i++) {
-				updateBallPhysics(balls.get(i));
-		}
 		for (int i = 0; i < paddles.size(); i++) {
 			updatePaddlePhysics(paddles.get(i));
 		}

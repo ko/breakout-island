@@ -91,7 +91,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		getHolder().addCallback(this);
 
-		physicsCache = new PhysicsCache(); 
+		physicsCache = new PhysicsCache();
+		
 		
 		// instantiate game loop thread
 		mainThread = new MainThread(getHolder(), this);
@@ -435,7 +436,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void updatePhysics() {
 
-		updatePhysicsCacheAdhocRemote();
 		updatePhysicsCacheLocal();
 		updatePhysicsGlobal();
 	}
@@ -443,40 +443,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void updatePhysicsGlobal() {
 		for (int i = 0; i < balls.size(); i++) {
 			updateBallPhysics(balls.get(i));
-		}
-	}
-
-	private void updatePhysicsCacheAdhocRemote() {
-		updateAdhocRemotePaddlePhysics();
-	}
-
-	private void updateAdhocRemotePaddlePhysics() {
-		HttpResponse res;
-		DefaultHttpClient client;
-		HttpGet get;
-		String url;
-		
-		url = "http://yaksok.net";
-		res = null;
-		client = new DefaultHttpClient();
-		get = new HttpGet(URI.create(url));
-		try {
-			res = client.execute(get);
-			switch (res.getStatusLine().getStatusCode()) {
-			case 401:
-				Log.d(TAG,"http: 401");
-				break;
-			case 200:
-				Log.d(TAG,"http: 200");
-				physicsCache.update(res.getEntity().getContent());
-				break;
-			default:
-				Log.d(TAG,"http: default");
-			}
-		}  catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			physicsCache.addObject(balls.get(i));
 		}
 	}
 
@@ -489,7 +456,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void updatePhysicsCacheLocal() {
 		for (int i = 0; i < paddles.size(); i++) {
 			updatePaddlePhysics(paddles.get(i));
+			physicsCache.addObject(paddles.get(i));
 		}
+		
+		// Joystick is entirely UI for "me", so no need to
+		// update this or sync with server.
 		if (joystick != null) 
 			updateJoystickPhysics();
 	}

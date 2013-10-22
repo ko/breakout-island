@@ -1,9 +1,9 @@
-package com.relurori.breakout;
+package com.relurori.engine.physics;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import com.relurori.engine.graphics.generic.Graphic;
+import com.relurori.breakout.PhysicsLocalhost;
 
 public class PhysicsCache {
 
@@ -15,6 +15,11 @@ public class PhysicsCache {
 	public PhysicsCache() {
 		objects = new ArrayList<Object>();
 		msCtimes = new ArrayList<Long>();
+	}
+	
+	public ArrayList<?> getLatestListOf(int index) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	public void addObject(Object o) {
@@ -31,6 +36,11 @@ public class PhysicsCache {
 	}
 
 	public void update(InputStream content) {
+		
+	}
+
+	public void updateStateOf(Object o) {
+		
 		
 	}
 }

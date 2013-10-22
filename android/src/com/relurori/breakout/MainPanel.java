@@ -50,8 +50,13 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private boolean DEBUG = false;
 	
 	private MainThread mainThread;
-	private MultiplayerNetworkThread networkThread;
+	private NetworkThread networkSendThread;
+	private NetworkThread networkRecvThread;
 
+	private static final int BRICKS = 0;
+	private static final int PADDLES = 1;
+	private static final int BALLS = 2;
+	
 	/*
 	 * TODO does it make sense to hold a reference to the calling Context and
 	 * Activity? Seems kinda sketch.
@@ -65,7 +70,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private ArrayList<Paddle> paddles = new ArrayList<Paddle>();
 	private Joystick joystick = null;
 	
-	private PhysicsCache physicsCache = null; 
+	private PhysicsLocalhost physicsCache = null; 
 	
 	private SoundPool sp = null;
 
@@ -91,19 +96,26 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		getHolder().addCallback(this);
 
-		physicsCache = new PhysicsCache();
-		
+		physicsCache = new PhysicsLocalhost();
 		
 		// instantiate game loop thread
 		mainThread = new MainThread(getHolder(), this);
-		networkThread = new MultiplayerNetworkThread(physicsCache);
-
+		
 		setFocusable(true);
 
 		this.context = context;
 		this.activity = activity;
-		
+
+		setupNetworkThreads();
 		setupSoundPool();
+	}
+
+	private void setupNetworkThreads() {
+		// depending on game mode, multiplayer or adhoc 
+		// or singleplayer instantiation
+		networkSendThread = new MultiplayerSend(physicsCache);
+		networkRecvThread = new MultiplayerReceive(physicsCache);
+
 	}
 
 	private void setupSoundPool() {
@@ -133,8 +145,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
-		networkThread.setRunning(true);
-		networkThread.start();
+		networkSendThread.setRunning(true);
+		networkSendThread.start();
+		
+		networkRecvThread.setRunning(true);
+		networkRecvThread.start();
 		
 		mainThread.setRunning(true);
 		mainThread.start();
@@ -151,7 +166,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 		while (retry) {
 			try {
 				mainThread.join();
-				networkThread.join();
+				networkSendThread.join();
+				networkRecvThread.join();
 				retry = false;
 			} catch (InterruptedException e) {
 				// try again
@@ -436,14 +452,29 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void updatePhysics() {
 
+		updateStateFromServer();
 		updatePhysicsCacheLocal();
 		updatePhysicsGlobal();
+		updateStateToServer();
+	}
+
+	private void updateStateToServer() {
+		physicsCache.updateStateOf(bricks);
+		physicsCache.updateStateOf(paddles);
+		physicsCache.updateStateOf(balls);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void updateStateFromServer() {
+		bricks = (ArrayList<Brick>)physicsCache.getLatestListOf(MainPanel.BRICKS);
+		paddles = (ArrayList<Paddle>) physicsCache.getLatestListOf(MainPanel.PADDLES);
+		balls = (ArrayList<Ball>) physicsCache.getLatestListOf(MainPanel.BALLS);
 	}
 
 	private void updatePhysicsGlobal() {
 		for (int i = 0; i < balls.size(); i++) {
 			updateBallPhysics(balls.get(i));
-			physicsCache.addObject(balls.get(i));
+			physicsCache.updateStateOf(balls.get(i));
 		}
 	}
 
@@ -456,7 +487,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void updatePhysicsCacheLocal() {
 		for (int i = 0; i < paddles.size(); i++) {
 			updatePaddlePhysics(paddles.get(i));
-			physicsCache.addObject(paddles.get(i));
+			physicsCache.updateStateOf(paddles.get(i));
 		}
 		
 		// Joystick is entirely UI for "me", so no need to
@@ -575,6 +606,7 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				
 				ballHitSound();
 				bricks.remove(j);
+				physicsCache.updateStateOf(bricks);
 				
 				if (bricks.isEmpty() == true) {
 					Log.d(TAG,"victory");

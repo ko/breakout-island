@@ -52,10 +52,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private MainThread mainThread;
 	private NetworkThread networkSendThread;
 	private NetworkThread networkRecvThread;
-
-	private static final int BRICKS = 0;
-	private static final int PADDLES = 1;
-	private static final int BALLS = 2;
 	
 	/*
 	 * TODO does it make sense to hold a reference to the calling Context and
@@ -64,10 +60,11 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private Context context;
 	private Activity activity;
 
-	private ArrayList<Ball> balls = new ArrayList<Ball>();
-	private ArrayList<Brick> bricks = new ArrayList<Brick>();
 	private Graphic currentGraphic = null;
-	private ArrayList<Paddle> paddles = new ArrayList<Paddle>();
+	
+	private ArrayList<Ball> balls = null;
+	private ArrayList<Brick> bricks = null;
+	private ArrayList<Paddle> paddles = null;
 	private Joystick joystick = null;
 	
 	private PhysicsLocalhost physicsCache = null; 
@@ -451,7 +448,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void updatePhysics() {
-
 		updateStateFromServer();
 		updatePhysicsCacheLocal();
 		updatePhysicsGlobal();
@@ -459,22 +455,20 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void updateStateToServer() {
-		physicsCache.updateStateOf(bricks);
-		physicsCache.updateStateOf(paddles);
-		physicsCache.updateStateOf(balls);
+		physicsCache.updateStateOfBricks(bricks);
+		physicsCache.updateStateOfPaddles(paddles);
+		physicsCache.updateStateOfBalls(balls);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void updateStateFromServer() {
-		bricks = (ArrayList<Brick>)physicsCache.getLatestListOf(MainPanel.BRICKS);
-		paddles = (ArrayList<Paddle>) physicsCache.getLatestListOf(MainPanel.PADDLES);
-		balls = (ArrayList<Ball>) physicsCache.getLatestListOf(MainPanel.BALLS);
+		bricks = physicsCache.getLatestBricks();
+		paddles = physicsCache.getLatestPaddles();
+		balls = physicsCache.getLatestBalls();
 	}
 
 	private void updatePhysicsGlobal() {
 		for (int i = 0; i < balls.size(); i++) {
 			updateBallPhysics(balls.get(i));
-			physicsCache.updateStateOf(balls.get(i));
 		}
 	}
 
@@ -487,7 +481,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 	private void updatePhysicsCacheLocal() {
 		for (int i = 0; i < paddles.size(); i++) {
 			updatePaddlePhysics(paddles.get(i));
-			physicsCache.updateStateOf(paddles.get(i));
 		}
 		
 		// Joystick is entirely UI for "me", so no need to
@@ -560,7 +553,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 
 			if (paddleLevel == 0) {
 				if (ball.getCoordinates().getX() < paddles.get(i).getWidth()) {
-					Log.d(TAG,"Paddle1?");
 					if (ballHitPaddle(paddles.get(i), ball)) {
 
 						ballHitSound();
@@ -572,7 +564,6 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 			} else {
 				// So this isn't scalable at all.
 				if (ball.getCoordinates().getX() + ball.getGraphic().getWidth() > paddleLevel) {
-					Log.d(TAG,"Paddle0?");
 					if (ballHitPaddle(paddles.get(i), ball)) {
 
 						ballHitSound();
@@ -606,7 +597,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
 				
 				ballHitSound();
 				bricks.remove(j);
-				physicsCache.updateStateOf(bricks);
+				// XXX needed?
+				physicsCache.updateStateOfBricks(bricks);
 				
 				if (bricks.isEmpty() == true) {
 					Log.d(TAG,"victory");

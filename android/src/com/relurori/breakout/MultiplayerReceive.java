@@ -18,8 +18,8 @@ public class MultiplayerReceive extends NetworkThread {
 	
 	private PhysicsLocalhost physicsCache = null;
 	
-	public MultiplayerReceive(PhysicsLocalhost physicsCache) {
-		// TODO Auto-generated constructor stub
+	public MultiplayerReceive(PhysicsLocalhost physicsCache2) {
+		physicsCache = physicsCache2;
 	}
 
 	// TODO UDP this with our own protocol

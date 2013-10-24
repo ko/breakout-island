@@ -3,6 +3,8 @@ package com.relurori.breakout;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 import com.relurori.engine.graphics.generic.Graphic;
 import com.relurori.engine.graphics.premade.Ball;
 import com.relurori.engine.graphics.premade.Brick;
@@ -65,5 +67,31 @@ public class PhysicsLocalhost extends PhysicsCache {
 	public void updateStateOfBalls(ArrayList<Ball> balls2) {
 		balls = balls2;
 		updateStateOf(PhysicsLocalhost.BALLS, balls);
+	}
+	
+	/**
+	 * Serialize objects' elements to JSON.
+	 */
+	public JSONObject toJson() {
+		bricksToJson();
+		paddlesToJson();
+		ballsToJson();
+		return jsonStateToSend;
+	}
+	
+	private void ballsToJson() {
+		objectToJson(PhysicsLocalhost.BALLS);
+	}
+
+	private void paddlesToJson() {
+		objectToJson(PhysicsLocalhost.PADDLES);
+	}
+
+	private void bricksToJson() {
+		objectToJson(PhysicsLocalhost.BRICKS);
+	}
+
+	public void fromJson(JSONObject json) {
+		
 	}
 }

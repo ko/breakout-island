@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 
 import android.util.Log;
 
@@ -31,9 +32,14 @@ public class MultiplayerSend extends NetworkThread {
 	}
 	
 	private void sendState() {
-		
+		sendJson(physicsCache.toJson());
 	}
 	
+	private void sendJson(JSONObject json) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private boolean stateChanged() {
 		return false;
 	}

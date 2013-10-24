@@ -3,6 +3,8 @@ package com.relurori.engine.physics;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.json.JSONObject;
+
 import android.util.Log;
 
 import com.relurori.breakout.PhysicsLocalhost;
@@ -12,6 +14,9 @@ public class PhysicsCache {
 	private final static String TAG = PhysicsCache.class.getSimpleName();
 
 	private static final boolean DEBUG = false;
+	
+	protected JSONObject jsonStateToSend = null;
+	private JSONObject jsonStateToRecv = null;
 	
 	/**
 	 * serverObjects is purgatory for object updates received
@@ -37,6 +42,9 @@ public class PhysicsCache {
 		msCtimes = new ArrayList<Long>();
 		serverObjects = new ArrayList<Object>();
 		serverMsCtimes = new ArrayList<Long>();
+		
+		jsonStateToSend = new JSONObject();
+		jsonStateToRecv = new JSONObject();
 	}
 	
 	public ArrayList<?> getLatestListOf(int index) {
@@ -73,5 +81,15 @@ public class PhysicsCache {
 			objects.add(index, o);
 			msCtimes.add(index, System.currentTimeMillis());
 		}
+	}
+	
+	public JSONObject toJson() {
+		return null;
+	}
+	public void fromJson(JSONObject json) {
+	}
+	
+	public void objectToJson(int index) {
+		
 	}
 }

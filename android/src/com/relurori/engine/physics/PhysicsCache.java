@@ -13,16 +13,39 @@ public class PhysicsCache {
 
 	private static final boolean DEBUG = false;
 	
+	/**
+	 * serverObjects is purgatory for object updates received
+	 * over the wire. If it is more recent than what's locally
+	 * stored, replace the local copy at objects.get(index) with
+	 * whatever's at serverObjects.get(index).
+	 * 
+	 * The network receive thread will update this.
+	 */
+	private ArrayList<Object> serverObjects;
+	private ArrayList<Long> serverMsCtimes;
+	
+	/**
+	 * objects is The Master List for object states. 
+	 * 
+	 * The network send thread will be sending from this.
+	 */
 	private ArrayList<Object> objects;
 	private ArrayList<Long> msCtimes;
 	
 	public PhysicsCache() {
 		objects = new ArrayList<Object>();
 		msCtimes = new ArrayList<Long>();
+		serverObjects = new ArrayList<Object>();
+		serverMsCtimes = new ArrayList<Long>();
 	}
 	
 	public ArrayList<?> getLatestListOf(int index) {
 		if (index < objects.size()) {
+			if (index < serverObjects.size()) {
+				if (serverMsCtimes.get(index) > msCtimes.get(index)) {
+					objects.set(index, serverObjects.get(index));
+				}
+			}
 			return (ArrayList<?>) objects.get(index);
 		} else {
 			return null;
@@ -50,6 +73,5 @@ public class PhysicsCache {
 			objects.add(index, o);
 			msCtimes.add(index, System.currentTimeMillis());
 		}
-		
 	}
 }

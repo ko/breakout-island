@@ -72,23 +72,23 @@ public class PhysicsLocalhost extends PhysicsCache {
 	/**
 	 * Serialize objects' elements to JSON.
 	 */
-	public JSONObject toJson() {
+	public String serialize() {
 		bricksToJson();
 		paddlesToJson();
 		ballsToJson();
-		return jsonStateToSend;
+		return thisSerialized;
 	}
 	
 	private void ballsToJson() {
-		objectToJson(PhysicsLocalhost.BALLS);
+		serializeList(PhysicsLocalhost.BALLS);
 	}
 
 	private void paddlesToJson() {
-		objectToJson(PhysicsLocalhost.PADDLES);
+		serializeList(PhysicsLocalhost.PADDLES);
 	}
 
 	private void bricksToJson() {
-		objectToJson(PhysicsLocalhost.BRICKS);
+		serializeList(PhysicsLocalhost.BRICKS);
 	}
 
 	public void fromJson(JSONObject json) {

@@ -32,10 +32,10 @@ public class MultiplayerSend extends NetworkThread {
 	}
 	
 	private void sendState() {
-		sendJson(physicsCache.toJson());
+		sendSerialized(physicsCache.serialize());
 	}
 	
-	private void sendJson(JSONObject json) {
+	private void sendSerialized(String serialized) {
 		// TODO Auto-generated method stub
 		
 	}

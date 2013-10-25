@@ -15,8 +15,8 @@ public class PhysicsCache {
 
 	private static final boolean DEBUG = false;
 	
-	protected JSONObject jsonStateToSend = null;
-	private JSONObject jsonStateToRecv = null;
+	protected String thisSerialized = null;
+	protected String toDeserialize = null;
 	
 	/**
 	 * serverObjects is purgatory for object updates received
@@ -43,8 +43,8 @@ public class PhysicsCache {
 		serverObjects = new ArrayList<Object>();
 		serverMsCtimes = new ArrayList<Long>();
 		
-		jsonStateToSend = new JSONObject();
-		jsonStateToRecv = new JSONObject();
+		thisSerialized = new String();
+		toDeserialize = new String();
 	}
 	
 	public ArrayList<?> getLatestListOf(int index) {
@@ -83,13 +83,22 @@ public class PhysicsCache {
 		}
 	}
 	
-	public JSONObject toJson() {
+	public String serialize() {
 		return null;
 	}
-	public void fromJson(JSONObject json) {
+	public void deserialize(String serialized) {
 	}
 	
-	public void objectToJson(int index) {
-		
+	public Object serializeObject(int index) {
+		return objects.get(index).toString();
+	}
+	
+	public Object serializeList(int index) {
+		String s = new String();
+		for (int i = 0; i < ((ArrayList<Object>)(objects.get(index))).size(); i++) {
+			s += ((ArrayList<Object>)(objects.get(index))).get(i).toString();
+			s += "|";
+		}
+		return s;
 	}
 }

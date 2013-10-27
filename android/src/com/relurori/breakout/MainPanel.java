@@ -20,6 +20,7 @@ import com.relurori.engine.graphics.premade.Paddle;
 import com.relurori.engine.graphics.shapes.meta.Collision;
 import com.relurori.engine.graphics.shapes.meta.Intersection;
 import com.relurori.engine.io.Joystick;
+import com.relurori.engine.main.Gameboard;
 import com.relurori.engine.main.MainThread;
 import com.relurori.engine.network.NetworkThread;
 
@@ -43,7 +44,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-public class MainPanel extends SurfaceView implements SurfaceHolder.Callback {
+public class MainPanel extends SurfaceView implements SurfaceHolder.Callback, Gameboard {
 
 	private static final String TAG = MainPanel.class.getSimpleName();
 

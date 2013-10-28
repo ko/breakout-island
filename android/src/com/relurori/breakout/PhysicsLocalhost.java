@@ -97,7 +97,41 @@ public class PhysicsLocalhost extends PhysicsCache {
 		return serializeList(PhysicsLocalhost.BRICKS);
 	}
 
-	public void fromJson(JSONObject json) {
-		
+	/**
+	 * deserialize to objects
+	 * 
+	 * Example parameter:
+	 * 
+	 * 		1382939829286,brick,93.4375150.0,50,50;
+	 * 		1382939829286,brick,560.625300.0,50,50;
+	 * 		1382939829286,paddle,721.575.0,26,150;
+	 * 		1382939829286,paddle,0.075.0,26,150;
+	 * 		1382939829287,ball,492.1875,525.0,10.0;
+	 * 
+	 * @return
+	 */
+	public void deserialize(Object o) {
+		updateStatesFromServer(o);
+		serialToBricks();
+		serialToPaddles();
+		serialToBalls();
+	}
+
+	private void serialToBalls() {
+
+		deserializeList(PhysicsLocalhost.BALLS,
+				getListStateFromServer(PhysicsLocalhost.BALLS));
+	}
+
+	private void serialToPaddles() {
+
+		deserializeList(PhysicsLocalhost.PADDLES,
+				getListStateFromServer(PhysicsLocalhost.PADDLES));
+	}
+
+	private void serialToBricks() {
+
+		deserializeList(PhysicsLocalhost.BRICKS,
+				getListStateFromServer(PhysicsLocalhost.BRICKS));
 	}
 }

@@ -16,7 +16,7 @@ public class PhysicsCache {
 	private static final boolean DEBUG = false;
 	
 	protected String serializedState = null;
-	protected String toDeserialize = null;
+	protected ArrayList<Object> statesFromServer = null;
 	private ArrayList<Object> serializedStates;
 
 	
@@ -46,8 +46,12 @@ public class PhysicsCache {
 		serverMsCtimes = new ArrayList<Long>();
 
 		serializedState = new String();
-		toDeserialize = new String();
+		statesFromServer = new ArrayList<Object>();
 		serializedStates = new ArrayList<Object>();
+	}
+
+	public ArrayList<Object> getStatesFromServer() {
+		return statesFromServer;
 	}
 	
 	public ArrayList<?> getLatestListOf(int index) {
@@ -92,6 +96,7 @@ public class PhysicsCache {
 	}
 	
 	public void deserialize(String serialized) {
+		Log.d(TAG,"deserialze unimplemented");
 	}
 	
 	public Object serializeObject(int index) {
@@ -111,6 +116,7 @@ public class PhysicsCache {
 		initSerializeList(index);
 		for (int i = 0; i < ((ArrayList<Object>)(objects.get(index))).size(); i++) {
 			serializedStates.set(index, serializedStates.get(index)
+					+ String.valueOf(msCtimes.get(index)) + ","
 					+ ((ArrayList<Object>) (objects.get(index))).get(i)
 							.toString());
 			serializedStates.set(index, serializedStates.get(index));
@@ -129,4 +135,59 @@ public class PhysicsCache {
 	protected void appendSerializedObject(Object serialObject) {
 		serializedState += serialObject;
 	}
+	
+	public void updateStatesFromServer(Object asset) {
+		deserializeToStrings(asset);
+	}
+	
+	private void deserializeToStrings(Object asset) {
+		for (int i = 0; i < ((String) asset).split(";").length; i++) {
+			statesFromServer.add(i, ((String) asset).split(";")[i]);
+		}
+	}
+	
+	public void deserializeList(int index, ArrayList<Object> array) {
+		synchronized(objects.get(index)) {
+			updateObjectsWithServer(index, array);
+		}
+	}
+
+	private void updateObjectsWithServer(int index, ArrayList<Object> array) {
+		if (serverIsNewer(index, array)) {
+			synchronized (objects) {
+				objects.remove(index);
+				objects.add(index, statesFromServer.get(index));
+			}
+		}
+	}
+
+	/**
+	 * compare timestamps between local "objects.get(index)" and
+	 * whatever "array" was passed in from caller.
+	 * 
+	 * @param index
+	 * @param array
+	 * @return
+	 */
+	private boolean serverIsNewer(int index, ArrayList<Object> array) {
+		
+		return false;
+	}
+	
+	/**
+	 * after going String to String[] to ArrayList, find the 
+	 * actual string to 
+	 * @param index
+	 * @return
+	 */
+	public ArrayList<Object> getListStateFromServer(int index) {
+		return (ArrayList<Object>) statesFromServer.get(index);
+	}
+	
+
+	
+
+
+
+
 }

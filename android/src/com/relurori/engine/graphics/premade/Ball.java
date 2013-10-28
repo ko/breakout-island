@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 
 public class Ball extends Circle {
 
+	private String thisString;
 	private boolean visible = false;
 	
 	public Ball(Bitmap bitmap) {
@@ -13,6 +14,7 @@ public class Ball extends Circle {
 		getSpeed().setX(5);
 		getSpeed().setY(5);
 		visible = true;
+		thisString = new String();
 	}
 	
 	public boolean getVisible() {
@@ -22,10 +24,14 @@ public class Ball extends Circle {
 	public void setVisible(boolean b) {
 		visible = b;
 	}
-
+	
+	/**
+	 * example: ball,x,y,r;
+	 */
 	public String toString() {
-		String s = "(x,y)=" + getCenter().getX() + "," + getCenter().getY() + ")";
-		s += " r=" + getRadius();
-		return s;
+		thisString = "ball" + ",";
+		thisString += super.toString();
+		thisString += ";";
+		return thisString;
 	}
 }

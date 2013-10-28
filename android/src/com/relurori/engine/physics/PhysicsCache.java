@@ -15,8 +15,9 @@ public class PhysicsCache {
 
 	private static final boolean DEBUG = false;
 	
-	protected String thisSerialized = null;
+	protected String serializedState = null;
 	protected String toDeserialize = null;
+	private ArrayList<Object> serializedStates;
 	
 	/**
 	 * serverObjects is purgatory for object updates received
@@ -43,8 +44,9 @@ public class PhysicsCache {
 		serverObjects = new ArrayList<Object>();
 		serverMsCtimes = new ArrayList<Long>();
 		
-		thisSerialized = new String();
+		serializedState = new String();
 		toDeserialize = new String();
+		serializedStates = new ArrayList<Object>();
 	}
 	
 	public ArrayList<?> getLatestListOf(int index) {
@@ -84,8 +86,10 @@ public class PhysicsCache {
 	}
 	
 	public String serialize() {
+		Log.d(TAG,"serialze unimplemented");
 		return null;
 	}
+	
 	public void deserialize(String serialized) {
 	}
 	
@@ -93,12 +97,35 @@ public class PhysicsCache {
 		return objects.get(index).toString();
 	}
 	
-	public Object serializeList(int index) {
-		String s = new String();
-		for (int i = 0; i < ((ArrayList<Object>)(objects.get(index))).size(); i++) {
-			s += ((ArrayList<Object>)(objects.get(index))).get(i).toString();
-			s += "|";
+	private void initSerializeList(int index) {
+		if (index < serializedStates.size()) {
+			serializedStates.set(index, "");
+		} else {
+			serializedStates.add(index, "");
 		}
-		return s;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Object serializeList(int index) {
+		initSerializeList(index);
+		for (int i = 0; i < ((ArrayList<Object>)(objects.get(index))).size(); i++) {
+			serializedStates.set(index, serializedStates.get(index)
+					+ ((ArrayList<Object>) (objects.get(index))).get(i)
+							.toString());
+			serializedStates.set(index, serializedStates.get(index));
+		}
+		return serializedStates.get(index);
+	}
+	
+	protected void initSerializedObjects() {
+		serializedState = "";
+	}
+	
+	protected String getSerializedObjects() {
+		return serializedState;
+	}
+	
+	protected void appendSerializedObject(Object serialObject) {
+		serializedState += serialObject;
 	}
 }

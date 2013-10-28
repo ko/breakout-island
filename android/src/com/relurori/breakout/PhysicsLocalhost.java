@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.relurori.engine.graphics.generic.Graphic;
 import com.relurori.engine.graphics.premade.Ball;
 import com.relurori.engine.graphics.premade.Brick;
@@ -71,24 +73,28 @@ public class PhysicsLocalhost extends PhysicsCache {
 	
 	/**
 	 * Serialize objects' elements to JSON.
+	 * 
+	 * TODO need synchronization for serializedState(s)?
 	 */
 	public String serialize() {
-		bricksToJson();
-		paddlesToJson();
-		ballsToJson();
-		return thisSerialized;
-	}
-	
-	private void ballsToJson() {
-		serializeList(PhysicsLocalhost.BALLS);
+		initSerializedObjects();
+		appendSerializedObject(bricksToJson());
+		appendSerializedObject(paddlesToJson());
+		appendSerializedObject(ballsToJson());
+		return getSerializedObjects();
 	}
 
-	private void paddlesToJson() {
-		serializeList(PhysicsLocalhost.PADDLES);
+
+	private Object ballsToJson() {
+		return serializeList(PhysicsLocalhost.BALLS);
 	}
 
-	private void bricksToJson() {
-		serializeList(PhysicsLocalhost.BRICKS);
+	private Object paddlesToJson() {
+		return serializeList(PhysicsLocalhost.PADDLES);
+	}
+
+	private Object bricksToJson() {
+		return serializeList(PhysicsLocalhost.BRICKS);
 	}
 
 	public void fromJson(JSONObject json) {

@@ -7,17 +7,17 @@ import android.graphics.Bitmap;
 
 public class Circle extends Polygon {
 
-	private Graphic.Coordinates center;
+	private String thisString;
 	
+	private Graphic.Coordinates center;
 	private float radius;
-	private float cx;
-	private float cy;
 	
 	public Circle(Bitmap bitmap) {
 		super(bitmap);
 		center = new Graphic.Coordinates();
-	
 		radius = bitmap.getWidth()/2;
+		
+		thisString = new String();
 	}
 	
 	public float getRadius() {
@@ -29,5 +29,17 @@ public class Circle extends Polygon {
 		center.setY(getCoordinates().getY() + bitmap.getHeight() / 2);
 		
 		return center;
+	}
+	
+
+	/**
+	 * example
+	 * 		"x,y,r"
+	 */
+	public String toString() {
+		thisString = "";
+		thisString += getCenter().getX() + "," + getCenter().getY() + ",";
+		thisString += getRadius();
+		return thisString;
 	}
 }

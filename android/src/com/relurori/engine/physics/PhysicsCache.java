@@ -18,6 +18,7 @@ public class PhysicsCache {
 	protected String serializedState = null;
 	protected String toDeserialize = null;
 	private ArrayList<Object> serializedStates;
+
 	
 	/**
 	 * serverObjects is purgatory for object updates received
@@ -43,7 +44,7 @@ public class PhysicsCache {
 		msCtimes = new ArrayList<Long>();
 		serverObjects = new ArrayList<Object>();
 		serverMsCtimes = new ArrayList<Long>();
-		
+
 		serializedState = new String();
 		toDeserialize = new String();
 		serializedStates = new ArrayList<Object>();

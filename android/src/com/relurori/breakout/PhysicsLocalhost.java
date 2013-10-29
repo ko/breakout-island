@@ -17,13 +17,28 @@ public class PhysicsLocalhost extends PhysicsCache {
 
 	private final static String TAG = PhysicsLocalhost.class.getSimpleName();
 
+	private String[] tempDeserial = new String[1];
+	private String tempDeserialObject = new String();
+	private int tempDeserialIndex = 0;
+	
 	private static final int BRICKS = 0;
 	private static final int PADDLES = 1;
 	private static final int BALLS = 2;
+
+	private static final int DESERIAL_TIMESTAMP = 0;
+	private static final int DESERIAL_OBJECT = 1;
+	private static final int DESERIAL_INDEX = 2;
 	
 	private ArrayList<Brick> bricks;
 	private ArrayList<Paddle> paddles;
 	private ArrayList<Ball> balls;
+	
+	private ArrayList<Brick> serverBricks;
+	private ArrayList<Paddle> serverPaddles;
+	private ArrayList<Ball> serverBalls;
+	private Brick tempBrick;
+	private Paddle tempPaddle;
+	private Ball tempBall;
 	
 	public PhysicsLocalhost() {
 		super();
@@ -102,36 +117,79 @@ public class PhysicsLocalhost extends PhysicsCache {
 	 * 
 	 * Example parameter:
 	 * 
-	 * 		1382939829286,brick,93.4375150.0,50,50;
-	 * 		1382939829286,brick,560.625300.0,50,50;
-	 * 		1382939829286,paddle,721.575.0,26,150;
-	 * 		1382939829286,paddle,0.075.0,26,150;
-	 * 		1382939829287,ball,492.1875,525.0,10.0;
+	 * 		1382939829286,1,brick,93.4375150.0,50,50;
+	 * 		1382939829286,2,brick,560.625300.0,50,50;
+	 * 		1382939829286,1,paddle,721.575.0,26,150;
+	 * 		1382939829286,2,paddle,0.075.0,26,150;
+	 * 		1382939829287,1,ball,492.1875,525.0,10.0;
 	 * 
 	 * @return
 	 */
 	public void deserialize(Object o) {
 		updateStatesFromServer(o);
-		serialToBricks();
-		serialToPaddles();
-		serialToBalls();
+		serialToObjects();
 	}
 
-	private void serialToBalls() {
-
-		deserializeList(PhysicsLocalhost.BALLS,
-				getListStateFromServer(PhysicsLocalhost.BALLS));
+	private void serialToObjects() {
+		for (int i = 0; i < getStatesFromServer().size(); i++) {
+			
+			tempDeserial = ((String) getStatesFromServer().get(i)).split(",");
+			tempDeserialObject = tempDeserial[this.DESERIAL_OBJECT];
+			tempDeserialIndex = Integer.getInteger(tempDeserial[this.DESERIAL_INDEX]);
+			
+			if (tempDeserialObject.equalsIgnoreCase(Brick.class.getSimpleName())) {
+				serialToBricks(tempDeserial);
+			} else if (tempDeserialObject.equalsIgnoreCase(Paddle.class.getSimpleName())) {
+				serialToPaddles(tempDeserial);
+			} else if (tempDeserialObject.equalsIgnoreCase(Ball.class.getSimpleName())) {
+				serialToBalls(tempDeserial);
+			}
+		}
 	}
 
-	private void serialToPaddles() {
-
-		deserializeList(PhysicsLocalhost.PADDLES,
-				getListStateFromServer(PhysicsLocalhost.PADDLES));
+	private void serialToBalls(String[] deserial) {
+		if (tempDeserialIndex < serverBalls.size()) {
+			tempBall = serverBalls.get(tempDeserialIndex);
+		} else {
+			tempBall = null;
+		}
+		if (tempBall == null) {
+			// TODO add a zero-argument constructor
+		}
+		tempBall.getCoordinates().setX(Float.valueOf(tempDeserial[Ball.DESERIAL_X]));
+		tempBall.getCoordinates().setY(Float.valueOf(tempDeserial[Ball.DESERIAL_Y]));
+		
+		serverBalls.add(tempDeserialIndex, tempBall);
 	}
 
-	private void serialToBricks() {
+	private void serialToPaddles(String[] deserial) {
+		if (tempDeserialIndex < serverPaddles.size()) {
+			tempPaddle = serverPaddles.get(tempDeserialIndex);
+		} else {
+			tempPaddle = null;
+		}
+		if (tempPaddle == null) {
+			// add a new paddle?!
+			// TODO add a zero-argument constructor. thanks.
+		}
+		tempPaddle.getCoordinates().setX(Float.valueOf(tempDeserial[Paddle.DESERIAL_X]));
+		tempPaddle.getCoordinates().setY(Float.valueOf(tempDeserial[Paddle.DESERIAL_Y]));
+		
+		serverPaddles.add(tempDeserialIndex, tempPaddle);
+	}
 
-		deserializeList(PhysicsLocalhost.BRICKS,
-				getListStateFromServer(PhysicsLocalhost.BRICKS));
+	private void serialToBricks(String[] deserial) {
+		if (tempDeserialIndex < serverBricks.size()) {
+			tempBrick = serverBricks.get(tempDeserialIndex);
+		} else {
+			tempBrick = null;
+		}
+		if (tempBrick == null) {
+			// TODO add a zero-argument constructor
+		}
+		tempBrick.getCoordinates().setX(Float.valueOf(tempDeserial[Brick.DESERIAL_X]));
+		tempBrick.getCoordinates().setY(Float.valueOf(tempDeserial[Brick.DESERIAL_Y]));
+		
+		serverBricks.add(tempDeserialIndex, tempBrick);
 	}
 }

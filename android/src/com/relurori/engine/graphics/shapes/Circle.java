@@ -8,6 +8,10 @@ import android.graphics.Bitmap;
 public class Circle extends Polygon {
 
 	private String thisString;
+
+	public static final int DESERIAL_X = 3;
+	public static final int DESERIAL_Y = 4;
+	public static final int DESERIAL_RADIUS = 5;
 	
 	private Graphic.Coordinates center;
 	private float radius;

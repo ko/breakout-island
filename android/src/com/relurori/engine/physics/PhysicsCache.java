@@ -15,8 +15,8 @@ public class PhysicsCache {
 
 	private static final boolean DEBUG = false;
 	
-	protected String serializedState = null;
-	protected ArrayList<Object> statesFromServer = null;
+	private String serializedState = null;
+	private ArrayList<Object> statesFromServer = null;
 	private ArrayList<Object> serializedStates;
 
 	
@@ -117,6 +117,7 @@ public class PhysicsCache {
 		for (int i = 0; i < ((ArrayList<Object>)(objects.get(index))).size(); i++) {
 			serializedStates.set(index, serializedStates.get(index)
 					+ String.valueOf(msCtimes.get(index)) + ","
+					+ String.valueOf(i) + ","
 					+ ((ArrayList<Object>) (objects.get(index))).get(i)
 							.toString());
 			serializedStates.set(index, serializedStates.get(index));
@@ -136,6 +137,19 @@ public class PhysicsCache {
 		serializedState += serialObject;
 	}
 	
+	/**
+	 * Convert this:
+	 * 
+	 * 		1382939829286,brick,93.4375150.0,50,50;
+	 * 		1382939829286,brick,560.625300.0,50,50;
+	 * 		1382939829286,paddle,721.575.0,26,150;
+	 * 		1382939829286,paddle,0.075.0,26,150;
+	 * 		1382939829287,ball,492.1875,525.0,10.0;
+	 * 
+	 * to an arraylist of strings		
+	 * 
+	 * @param asset
+	 */
 	public void updateStatesFromServer(Object asset) {
 		deserializeToStrings(asset);
 	}

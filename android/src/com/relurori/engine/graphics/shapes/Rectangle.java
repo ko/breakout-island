@@ -9,6 +9,11 @@ public class Rectangle extends Polygon {
 
 	private String thisString;
 	
+	public static final int DESERIAL_X = 3;
+	public static final int DESERIAL_Y = 4;
+	public static final int DESERIAL_WIDTH = 5;
+	public static final int DESERIAL_HEIGHT = 6;
+	
 	public Rectangle(Bitmap bitmap) {
 		super(bitmap);
 		thisString = new String();

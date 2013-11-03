@@ -155,9 +155,11 @@ public class PhysicsCache {
 	}
 	
 	private void deserializeToStrings(Object asset) {
+		Log.d(TAG,"deserializeToStrings|start");
 		for (int i = 0; i < ((String) asset).split(";").length; i++) {
 			statesFromServer.add(i, ((String) asset).split(";")[i]);
 		}
+		Log.d(TAG,"deserializeToStrings|finish");
 	}
 	
 	public void deserializeList(int index, ArrayList<Object> array) {

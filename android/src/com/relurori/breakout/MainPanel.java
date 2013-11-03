@@ -460,7 +460,8 @@ public class MainPanel extends SurfaceView implements SurfaceHolder.Callback, Ga
 		physicsCache.updateStateOfPaddles(paddles);
 		physicsCache.updateStateOfBalls(balls);
 		
-		Log.d(TAG,physicsCache.serialize());
+
+		physicsCache.deserialize(physicsCache.serialize());
 	}
 
 	private void updateStateFromServer() {

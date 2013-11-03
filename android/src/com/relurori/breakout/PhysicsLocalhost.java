@@ -125,8 +125,10 @@ public class PhysicsLocalhost extends PhysicsCache {
 	 * 
 	 * @return
 	 */
-	public void deserialize(Object o) {
-		updateStatesFromServer(o);
+	@Override
+	public void deserialize(String s) {
+		Log.d(TAG,"deserializing");
+		updateStatesFromServer(s);
 		serialToObjects();
 	}
 
